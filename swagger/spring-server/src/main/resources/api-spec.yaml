@@ -33,6 +33,7 @@ paths:
           description: The articleID the user want to list comment from
           required: true
           type: integer
+          format: int64
       tags:
         - Comments
       responses:
@@ -56,6 +57,7 @@ paths:
           description: ID of the comment we want to edit.
           required: true
           type: integer
+          format: int64
       tags:
         - Comments
       responses:
@@ -76,6 +78,7 @@ paths:
           description: ID of the comment we want to delete
           required: true
           type: integer
+          format: int64
       tags:
         - Comments
       responses:
@@ -96,6 +99,7 @@ definitions:
     properties:
       authorID:
         type: integer
+        format: int64
         description: The ID of the comment author. (To be linked with the user microservice)
       author:
         type: string
@@ -105,14 +109,17 @@ definitions:
         description: The content of the comment.
       articleID:
         type: integer
+        format: int64
         description: The ID of the associated article.
       parentID:
         type: integer
+        format: int64
         description: (Optionnal) The ID of the responded comment.
   CommentResponse:
     properties:
       authorID:
         type: integer
+        format: int64
         description: The ID of the comment author. (To be linked with the user microservice)
       author:
         type: string
@@ -122,12 +129,15 @@ definitions:
         description: The content of the comment.
       articleID:
         type: integer
+        format: int64
         description: The ID of the associated article.
       parentID:
         type: integer
+        format: int64
         description: (Optionnal) The ID of the responded comment.
       id:
         type: integer
+        format: int64
         description: The ID of the comment
       date:
         type: string
