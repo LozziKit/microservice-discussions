@@ -1,4 +1,4 @@
-Feature: Creation of a discussion
+Feature: Commenting an article
 
   Background:
     Given there is an article server

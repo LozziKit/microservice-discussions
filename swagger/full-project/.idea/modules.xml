@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../fruits-specs/discussionsSpecification.iml" filepath="$PROJECT_DIR$/../fruits-specs/discussionsSpecification.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../discussions-specs/discussionsSpecification.iml" filepath="$PROJECT_DIR$/../discussions-specs/discussionsSpecification.iml" />
       <module fileurl="file://$PROJECT_DIR$/../spring-server/swagger-spring.iml" filepath="$PROJECT_DIR$/../spring-server/swagger-spring.iml" />
     </modules>
   </component>

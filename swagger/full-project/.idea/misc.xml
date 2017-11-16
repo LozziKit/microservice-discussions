@@ -4,7 +4,7 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/../spring-server/pom.xml" />
-        <option value="$PROJECT_DIR$/../fruits-specs/pom.xml" />
+        <option value="$PROJECT_DIR$/../discussions-specs/pom.xml" />
       </list>
     </option>
   </component>
