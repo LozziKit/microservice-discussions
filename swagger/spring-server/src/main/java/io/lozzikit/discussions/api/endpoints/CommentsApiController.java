@@ -63,7 +63,9 @@ public class CommentsApiController implements CommentsApi {
         entity.setAuthorID(comment.getAuthorID());
         entity.setDate(new Date());
         entity.setMessage(comment.getMessage());
-        entity.setParentID(comment.getParentID());
+
+        if(comment.getParentID() != null)
+            entity.setParent(commentRepository.findOne(comment.getParentID()));
 
         return entity;
     }
@@ -77,7 +79,9 @@ public class CommentsApiController implements CommentsApi {
         response.setDate(new DateTime(comment.getDate()));
         response.setId(comment.getId());
         response.setMessage(comment.getMessage());
-        response.setParentID(comment.getParentID());
+
+        if(comment.getParent() != null)
+            response.setParentID(comment.getParent().getId());
 
         return response;
     }
