@@ -33,7 +33,7 @@ public class CommentEntity implements Serializable {
         return authorID;
     }
 
-    public void setAuthorID(long authorID) {
+    public void setAuthorID(long authorIDah) {
         this.authorID = authorID;
     }
 
