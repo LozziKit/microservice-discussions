@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Created by Olivier Liechti on 26/07/17.
@@ -24,7 +25,7 @@ public class CommentEntity implements Serializable {
     private String message;
     private long articleID;
     private long parentID;
-    private DateTime date;
+    private Date date;
 
     public long getId() {
         return id;
@@ -70,11 +71,11 @@ public class CommentEntity implements Serializable {
         this.parentID = parentID;
     }
 
-    public DateTime getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(DateTime date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 }
