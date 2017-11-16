@@ -11,7 +11,7 @@ Feature: Creation of a discussion
   Scenario: getting all comments of an article
     Given There are some articles on the server
     When I send a GET to the /comments endpoint
-    Then I receive a list of these articles
+    Then I receive a list of these comments
 
   Scenario: check that the comment has been written
     Given I have a comment payload
