@@ -1,0 +1,162 @@
+swagger: '2.0'
+info:
+  title: Microservice-Discussion API
+  description: Move your app forward with the Discussion API
+  version: 0.0.1
+paths:
+  /comments:
+    post:
+      summary: Register a comment
+      description: The /comments endpoint allows a user to register a comment to an article or another comment of an article.
+      parameters:
+        - name: comment
+          in: body
+          description: The comment the user want to post
+          required: true
+          schema:
+            $ref: '#/definitions/CommentRequest'
+      tags:
+        - Comments
+      responses:
+        '201':
+          description: Comment successfully posted
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Get the comments of an article
+      description: The /comments endpoint allows a user to retreive all of the comments associated to an article.
+      parameters:
+        - name: articleID
+          in: query
+          description: The articleID the user want to list comment from
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - Comments
+      responses:
+        '200':
+          description: The list of the comments
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CommentResponse'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/comments/{id}':
+    put:
+      summary: Update a comment
+      description: 'The /comments/{id} endpoint allows a user to update a comment.'
+      parameters:
+        - name: id
+          in: path
+          description: ID of the comment we want to edit.
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - Comments
+      responses:
+        '200':
+          description: The registered comment
+          schema:
+            $ref: '#/definitions/CommentResponse'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete a comment
+      description: This endpoint allows a user to delete a comment.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the comment we want to delete
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - Comments
+      responses:
+        '204':
+          description: The comment has been successfully deleted
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  CommentRequest:
+    type: object
+    required:
+      - authorID
+      - author
+      - message
+      - articleID
+    properties:
+      authorID:
+        type: integer
+        format: int64
+        description: The ID of the comment author. (To be linked with the user microservice)
+      author:
+        type: string
+        description: The name of the creator of the comment
+      message:
+        type: string
+        description: The content of the comment.
+      articleID:
+        type: integer
+        format: int64
+        description: The ID of the associated article.
+      parentID:
+        type: integer
+        format: int64
+        description: (Optionnal) The ID of the responded comment.
+  CommentResponse:
+    properties:
+      authorID:
+        type: integer
+        format: int64
+        description: The ID of the comment author. (To be linked with the user microservice)
+      author:
+        type: string
+        description: The name of the creator of the comment
+      message:
+        type: string
+        description: The content of the comment.
+      articleID:
+        type: integer
+        format: int64
+        description: The ID of the associated article.
+      parentID:
+        type: integer
+        format: int64
+        description: (Optionnal) The ID of the responded comment.
+      id:
+        type: integer
+        format: int64
+        description: The ID of the comment
+      date:
+        type: string
+        format: date-time
+        description: Display name of product.
+    required:
+      - authorID
+      - author
+      - message
+      - articleID
+      - id
+      - date
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
