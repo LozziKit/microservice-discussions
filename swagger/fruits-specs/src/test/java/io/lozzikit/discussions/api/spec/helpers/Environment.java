@@ -1,6 +1,6 @@
 package io.lozzikit.discussions.api.spec.helpers;
 
-import io.avalia.fruits.api.DefaultApi;
+import io.lozzikit.discussions.api.CommentsApi;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -10,7 +10,7 @@ import java.util.Properties;
  */
 public class Environment {
 
-    private DefaultApi api = new DefaultApi();
+    private CommentsApi api = new CommentsApi();
 
     public Environment() throws IOException {
         Properties properties = new Properties();
@@ -20,7 +20,7 @@ public class Environment {
 
     }
 
-    public DefaultApi getApi() {
+    public CommentsApi getApi() {
         return api;
     }
 
