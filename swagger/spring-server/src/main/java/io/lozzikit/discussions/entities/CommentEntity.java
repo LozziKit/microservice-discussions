@@ -1,8 +1,5 @@
 package io.lozzikit.discussions.entities;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.joda.time.DateTime;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;

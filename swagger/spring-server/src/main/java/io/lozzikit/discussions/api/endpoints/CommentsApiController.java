@@ -10,12 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import sun.security.provider.certpath.OCSPResponse;
 
-import javax.xml.stream.events.Comment;
-import javax.xml.ws.Response;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +28,7 @@ public class CommentsApiController implements CommentsApi {
         List<CommentEntity> commentsEntities = commentRepository.findByArticleID((long) articleID);
 
         List<CommentResponse> responses = commentsEntities.stream()
-                .map( s -> toCommentResponse(s)).collect(Collectors.toList());
+                .map(s -> toCommentResponse(s)).collect(Collectors.toList());
 
         return ResponseEntity.ok(responses);
     }
@@ -56,7 +51,7 @@ public class CommentsApiController implements CommentsApi {
         return new ResponseEntity<Void>(HttpStatus.CREATED);
     }
 
-    private CommentEntity toCommentEntity(CommentRequest comment){
+    private CommentEntity toCommentEntity(CommentRequest comment) {
         CommentEntity entity = new CommentEntity();
         entity.setArticleID(comment.getArticleID());
         entity.setAuthor(comment.getAuthor());
@@ -64,13 +59,13 @@ public class CommentsApiController implements CommentsApi {
         entity.setDate(new Date());
         entity.setMessage(comment.getMessage());
 
-        if(comment.getParentID() != null)
+        if (comment.getParentID() != null)
             entity.setParent(commentRepository.findOne(comment.getParentID()));
 
         return entity;
     }
 
-    public CommentResponse toCommentResponse(CommentEntity comment){
+    public CommentResponse toCommentResponse(CommentEntity comment) {
         CommentResponse response = new CommentResponse();
 
         response.setArticleID(comment.getArticleID());
@@ -80,7 +75,7 @@ public class CommentsApiController implements CommentsApi {
         response.setId(comment.getId());
         response.setMessage(comment.getMessage());
 
-        if(comment.getParent() != null)
+        if (comment.getParent() != null)
             response.setParentID(comment.getParent().getId());
 
         return response;
