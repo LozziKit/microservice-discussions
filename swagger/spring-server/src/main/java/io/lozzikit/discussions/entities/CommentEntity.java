@@ -3,15 +3,11 @@ package io.lozzikit.discussions.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.joda.time.DateTime;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Created by Olivier Liechti on 26/07/17.
  */
 @Entity
 public class CommentEntity implements Serializable {
@@ -24,7 +20,9 @@ public class CommentEntity implements Serializable {
     private String author;
     private String message;
     private long articleID;
-    private long parentID;
+
+    @ManyToOne
+    private CommentEntity parent;
     private Date date;
 
     public long getId() {
@@ -63,12 +61,12 @@ public class CommentEntity implements Serializable {
         this.articleID = articleID;
     }
 
-    public long getParentID() {
-        return parentID;
+    public CommentEntity getParent() {
+        return parent;
     }
 
-    public void setParentID(long parentID) {
-        this.parentID = parentID;
+    public void setParent(CommentEntity parent) {
+        this.parent = parent;
     }
 
     public Date getDate() {
