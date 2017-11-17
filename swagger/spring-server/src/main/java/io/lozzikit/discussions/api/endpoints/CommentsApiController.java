@@ -49,6 +49,9 @@ public class CommentsApiController implements CommentsApi {
 
     @Override
     public ResponseEntity<Void> commentsPost(@ApiParam(value = "The comment the user want to post" ,required=true ) @RequestBody CommentRequest comment){
+        if(comment.getMessage() == null){
+            return new ResponseEntity<Void>(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
         CommentEntity entity = toCommentEntity(comment);
         commentRepository.save(entity);
 
@@ -60,7 +63,6 @@ public class CommentsApiController implements CommentsApi {
         entity.setArticleID(comment.getArticleID());
         entity.setAuthor(comment.getAuthor());
         entity.setAuthorID(comment.getAuthorID());
-        entity.setDate(new Date());
         entity.setMessage(comment.getMessage());
 
         if (comment.getParentID() != null)

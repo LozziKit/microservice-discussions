@@ -20,7 +20,7 @@ public class CommentEntity implements Serializable {
 
     @ManyToOne
     private CommentEntity parent;
-    private Date date;
+    private Date date = new Date();
 
     public long getId() {
         return id;
