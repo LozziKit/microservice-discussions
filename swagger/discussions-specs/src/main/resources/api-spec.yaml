@@ -3,6 +3,10 @@ info:
   title: Microservice-Discussion API
   description: Move your app forward with the Discussion API
   version: 0.0.1
+host: localhost:8080
+basePath: /api
+schemes:
+  - http
 paths:
   /comments:
     post:

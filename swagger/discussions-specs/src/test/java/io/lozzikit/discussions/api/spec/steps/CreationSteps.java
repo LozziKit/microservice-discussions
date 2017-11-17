@@ -22,6 +22,7 @@ public class CreationSteps {
     private CommentsApi api;
 
 
+
     private CommentRequest commentRequest;
     private CommentResponse commentResponse;
     private List<CommentResponse> commentsResponse;
@@ -48,6 +49,7 @@ public class CreationSteps {
 
     @When("^I POST it to the /comments endpoint$")
     public void i_POST_it_to_the_comments_endpoint() throws Throwable {
+
         try {
             lastApiResponse = api.createCommentWithHttpInfo(commentRequest);
             lastApiCallThrewException = false;
@@ -59,6 +61,7 @@ public class CreationSteps {
             lastApiException = e;
             lastStatusCode = lastApiException.getCode();
         }
+
     }
 
     @Then("^I receive a (\\d+) status code$")
@@ -109,5 +112,11 @@ public class CreationSteps {
     @Then("^The new comment should be in the list$")
     public void the_new_comment_should_be_in_the_list() throws Throwable {
         assertTrue(commentsResponse.find(comment));
+    }
+
+    @Then("^I receive a list of these comments$")
+    public void i_receive_a_list_of_these_comments() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        // throw new PendingException();
     }
 }
