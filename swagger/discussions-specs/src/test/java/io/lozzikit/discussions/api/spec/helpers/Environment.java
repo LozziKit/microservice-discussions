@@ -15,9 +15,8 @@ public class Environment {
     public Environment() throws IOException {
         Properties properties = new Properties();
         properties.load(this.getClass().getClassLoader().getResourceAsStream("environment.properties"));
-        String url = properties.getProperty("io.avalia.fruits.server.url");
+        String url = properties.getProperty("io.lozzikit.discussions.server.url");
         api.getApiClient().setBasePath(url);
-
     }
 
     public CommentsApi getApi() {
