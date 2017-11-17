@@ -41,21 +41,10 @@ public class CreationSteps {
         assertNotNull(api);
     }
 
-    @Given("^I have a comment payload$")
-    public void i_have_a_comment_payload() throws Throwable {
-        commentRequest = new CommentRequest();
-    }
-
-    @Given("^There are some comment for that article on the server$")
-    public void there_are_some_comment_for_that_article_on_the_server() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
-    }
-
     @When("^I POST it to the /comments endpoint$")
     public void i_POST_it_to_the_comments_endpoint() throws Throwable {
         try {
-            api.commentsPost(commentRequest);
+            lastApiResponse = api.commentsPostWithHttpInfo(commentRequest);
             lastApiCallThrewException = false;
             lastApiException = null;
             lastStatusCode = lastApiResponse.getStatusCode();
@@ -67,37 +56,89 @@ public class CreationSteps {
         }
     }
 
-    @When("^I send a GET to the /comments endpoint for an article$")
-    public void i_send_a_GET_to_the_comments_endpoint_for_an_article() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
-    }
-
     @Then("^I receive a (\\d+) status code$")
     public void i_receive_a_status_code(int arg1) throws Throwable {
-        assertEquals(201, lastStatusCode);
-    }
-
-    @Then("^I receive a list of the article comments$")
-    public void i_receive_a_list_of_the_article_comments() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
-    }
-
-    @When("^I ask for a list of all the comments for an article by sending a GET to the /comments endpoint$")
-    public void i_ask_for_a_list_of_all_the_comments_for_an_article_by_sending_a_GET_to_the_comments_endpoint() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+        assertEquals(arg1, lastStatusCode);
     }
 
     @When("^The payload is an empty comment$")
     public void the_payload_is_an_empty_comment() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+        if (commentRequest != null){
+            if (!commentRequest.getMessage().isEmpty()){
+                commentRequest.setMessage("");
+            }
+        } else {
+            commentRequest = createCommentRequest(1, 1, "El papa", "", 1);
+        }
     }
 
     @Then("^The new comment should be in the list$")
     public void the_new_comment_should_be_in_the_list() throws Throwable {
-        //assertTrue(commentsResponse.find(comment));
+        boolean commentFound = false;
+        for (CommentResponse commentResponse : commentsResponse){
+            if (compareCommentRequestAndCommentResponse(commentRequest, commentResponse)){
+                commentFound = true;
+                break;
+            }
+        }
+        assertTrue(commentFound);
+    }
+
+    @Given("^I have a comment payload for article (\\d+)$")
+    public void i_have_a_comment_payload_for_article(long arg1) throws Throwable {
+        commentRequest = createCommentRequest(arg1, 42, "Le pape", "Amen", (long) 1);
+    }
+
+    @Given("^There are some comment for article (\\d+) on the server$")
+    public void there_are_some_comment_for_article_on_the_server(int arg1) throws Throwable {
+        api.commentsPost(createCommentRequest(arg1, 2, "Guy1", "Hello", 1));
+        api.commentsPost(createCommentRequest(arg1, 3, "Guy2", "How do you do", 1));
+    }
+
+    @When("^I send a GET to the /comments endpoint for article (\\d+)$")
+    public void i_send_a_GET_to_the_comments_endpoint_for_article(long arg1) throws Throwable {
+        try {
+            lastApiResponse = api.commentsGetWithHttpInfo(arg1);
+            commentsResponse = (List<CommentResponse>) lastApiResponse.getData();
+            lastApiCallThrewException = false;
+            lastApiException = null;
+            lastStatusCode = lastApiResponse.getStatusCode();
+        } catch (ApiException e) {
+            lastApiCallThrewException = true;
+            lastApiResponse = null;
+            lastApiException = e;
+            lastStatusCode = lastApiException.getCode();
+        }
+    }
+
+    @Then("^I receive a list of the article (\\d+) comments$")
+    public void i_receive_a_list_of_the_article_comments(long arg1) throws Throwable {
+        assertTrue(!commentsResponse.isEmpty());
+    }
+
+    public CommentRequest createCommentRequest(
+            long articleID,
+            long authorID,
+            String author,
+            String message,
+            long parentID)
+    {
+        CommentRequest cr = new CommentRequest();
+        cr.setArticleID(articleID);
+        cr.setAuthor(author);
+        cr.setAuthorID(authorID);
+        cr.setMessage(message);
+        cr.setParentID(parentID);
+
+        return cr;
+    }
+
+    public boolean compareCommentRequestAndCommentResponse(CommentRequest commentRequest, CommentResponse commentResponse){
+        System.out.println(commentRequest.getAuthorID() + " " + commentResponse.getAuthorID());
+        return  commentRequest.getMessage().equals(commentResponse.getMessage()) &&
+                commentRequest.getArticleID().equals(commentResponse.getArticleID()) &&
+                commentRequest.getAuthor().equals(commentResponse.getAuthor()) &&
+                commentRequest.getAuthorID().equals(commentResponse.getAuthorID()) &&
+                commentRequest.getParentID().equals(commentResponse.getParentID());
     }
 }
