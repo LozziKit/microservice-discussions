@@ -4,9 +4,7 @@ import io.lozzikit.discussions.api.CommentsApi;
 import io.lozzikit.discussions.api.model.CommentRequest;
 import io.lozzikit.discussions.api.model.CommentResponse;
 import io.lozzikit.discussions.api.services.CommentService;
-import io.lozzikit.discussions.entities.CommentEntity;
 import io.swagger.annotations.ApiParam;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +33,7 @@ public class CommentsApiController implements CommentsApi {
 
     @Override
     public ResponseEntity<Void> commentsIdDelete(@ApiParam(value = "ID of the comment we want to delete", required = true) @PathVariable("id") Long id) {
-        if(!commentService.commentExist(id)){
+        if (!commentService.commentExist(id)) {
             return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
         }
 
@@ -45,14 +43,16 @@ public class CommentsApiController implements CommentsApi {
     }
 
     @Override
-    public ResponseEntity<CommentResponse> commentsIdPut(@ApiParam(value = "ID of the comment we want to edit.", required = true) @PathVariable("id") Long id) {
-        if(!commentService.commentExist(id)){
+    public ResponseEntity<CommentResponse> commentsIdPut(@ApiParam(value = "ID of the comment we want to edit.", required = true) @PathVariable("id") Long id,
+                                                         @ApiParam(value = "The comment the user want to post", required = true) @RequestBody CommentRequest comment) {
+        if (!commentService.commentExist(id)) {
             return new ResponseEntity<CommentResponse>(HttpStatus.NOT_FOUND);
         }
-        if(!commentService.commentExist(id)){
+        if (!commentService.containsMessage(comment)) {
             return new ResponseEntity<CommentResponse>(HttpStatus.NOT_FOUND);
         }
 
+        commentService.updateComment(id, comment);
 
         return new ResponseEntity<CommentResponse>(HttpStatus.OK);
     }

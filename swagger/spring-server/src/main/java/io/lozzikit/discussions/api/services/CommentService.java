@@ -33,19 +33,25 @@ public class CommentService {
         commentRepository.save(entity);
     }
 
-    public boolean commentExist(long commentID){
+    public boolean commentExist(long commentID) {
         return commentRepository.exists(commentID);
     }
 
-    public void deleteComment(long commentID){
+    public void deleteComment(long commentID) {
         CommentEntity commentEntity = commentRepository.findOne(commentID);
-        if(commentEntity.isLeaf()){
+        if (commentEntity.isLeaf()) {
             commentRepository.delete(commentEntity);
-        }
-        else{
+        } else {
             commentEntity.setMessage("");
+            commentEntity.setAuthor("");
             commentRepository.save(commentEntity);
         }
+    }
+
+    public void updateComment(long commentID, CommentRequest commentRequest) {
+        CommentEntity commentEntity = commentRepository.findOne(commentID);
+        commentEntity.setMessage(commentRequest.getMessage());;
+        commentRepository.save(commentEntity);
     }
 
     private CommentEntity toCommentEntity(CommentRequest comment) {

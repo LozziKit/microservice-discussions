@@ -62,6 +62,12 @@ paths:
           required: true
           type: integer
           format: int64
+        - name: comment
+          in: body
+          description: The comment the user want to post
+          required: true
+          schema:
+            $ref: '#/definitions/CommentRequest'
       tags:
         - Comments
       responses:
