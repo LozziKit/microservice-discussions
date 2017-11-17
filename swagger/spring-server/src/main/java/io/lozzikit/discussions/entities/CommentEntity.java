@@ -3,20 +3,26 @@ package io.lozzikit.discussions.entities;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 /**
  */
 @Entity
+@Table(name = "comments")
 public class CommentEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "comments_id")
     private long id;
 
     private long authorID;
     private String author;
     private String message;
     private long articleID;
+
+    @OneToMany
+    private Set<CommentEntity> fils;
 
     @ManyToOne
     private CommentEntity parent;
@@ -72,5 +78,9 @@ public class CommentEntity implements Serializable {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public boolean isLeaf(){
+        return fils.isEmpty();
     }
 }
