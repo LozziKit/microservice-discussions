@@ -1,5 +1,6 @@
 package io.lozzikit.discussions.api.spec.steps;
 
+import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -21,8 +22,6 @@ public class CreationSteps {
     private Environment environment;
     private CommentsApi api;
 
-
-
     private CommentRequest commentRequest;
     private CommentResponse commentResponse;
     private List<CommentResponse> commentsResponse;
@@ -37,7 +36,7 @@ public class CreationSteps {
         this.api = environment.getApi();
     }
 
-    @Given("^there is an article server$")
+    @Given("^there is a discussion microservice up$")
     public void there_is_an_article_server() throws Throwable {
         assertNotNull(api);
     }
@@ -47,11 +46,16 @@ public class CreationSteps {
         commentRequest = new CommentRequest();
     }
 
+    @Given("^There are some comment for that article on the server$")
+    public void there_are_some_comment_for_that_article_on_the_server() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
     @When("^I POST it to the /comments endpoint$")
     public void i_POST_it_to_the_comments_endpoint() throws Throwable {
-
         try {
-            lastApiResponse = api.createCommentWithHttpInfo(commentRequest);
+            api.commentsPost(commentRequest);
             lastApiCallThrewException = false;
             lastApiException = null;
             lastStatusCode = lastApiResponse.getStatusCode();
@@ -61,7 +65,12 @@ public class CreationSteps {
             lastApiException = e;
             lastStatusCode = lastApiException.getCode();
         }
+    }
 
+    @When("^I send a GET to the /comments endpoint for an article$")
+    public void i_send_a_GET_to_the_comments_endpoint_for_an_article() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
     }
 
     @Then("^I receive a (\\d+) status code$")
@@ -69,54 +78,26 @@ public class CreationSteps {
         assertEquals(201, lastStatusCode);
     }
 
-    @Given("^There are some articles on the server$")
-    public void there_are_some_articles_on_the_server() throws Throwable {
+    @Then("^I receive a list of the article comments$")
+    public void i_receive_a_list_of_the_article_comments() throws Throwable {
         // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
     }
 
-    @When("^I send a GET to the /comments endpoint$")
-    public void i_send_a_GET_to_the_comments_endpoint() throws Throwable {
-        try {
-            lastApiResponse = api.getAllComments(); // TODO liste de commentaires reçue ?
-            lastApiCallThrewException = false;
-            lastApiException = null;
-            lastStatusCode = lastApiResponse.getStatusCode();
-        } catch (ApiException e) {
-            lastApiCallThrewException = true;
-            lastApiResponse = null;
-            lastApiException = e;
-            lastStatusCode = lastApiException.getCode();
-        }
+    @When("^I ask for a list of all the comments for an article by sending a GET to the /comments endpoint$")
+    public void i_ask_for_a_list_of_all_the_comments_for_an_article_by_sending_a_GET_to_the_comments_endpoint() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
     }
 
-    @Then("^I receive a list of these articles$")
-    public void i_receive_a_list_of_these_articles() throws Throwable {
-        assertNotEquals(0, commentsResponse.size());
-    }
-
-    @When("^I ask for a list of all the comments by sending a GET to the /comments endpoint$")
-    public void i_ask_for_a_list_of_all_the_comments_by_sending_a_GET_to_the_comments_endpoint() throws Throwable {
-        try {
-            lastApiResponse = api.getAllComments(); // TODO liste de commentaires reçue ?
-            lastApiCallThrewException = false;
-            lastApiException = null;
-            lastStatusCode = lastApiResponse.getStatusCode();
-        } catch (ApiException e) {
-            lastApiCallThrewException = true;
-            lastApiResponse = null;
-            lastApiException = e;
-            lastStatusCode = lastApiException.getCode();
-        }
+    @When("^The payload is an empty comment$")
+    public void the_payload_is_an_empty_comment() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
     }
 
     @Then("^The new comment should be in the list$")
     public void the_new_comment_should_be_in_the_list() throws Throwable {
-        assertTrue(commentsResponse.find(comment));
-    }
-
-    @Then("^I receive a list of these comments$")
-    public void i_receive_a_list_of_these_comments() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        // throw new PendingException();
+        //assertTrue(commentsResponse.find(comment));
     }
 }
