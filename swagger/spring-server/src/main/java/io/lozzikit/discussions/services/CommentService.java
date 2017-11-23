@@ -1,4 +1,4 @@
-package io.lozzikit.discussions.api.services;
+package io.lozzikit.discussions.services;
 
 import io.lozzikit.discussions.api.model.CommentRequest;
 import io.lozzikit.discussions.api.model.CommentResponse;
@@ -17,11 +17,18 @@ public class CommentService {
     @Autowired
     CommentRepository commentRepository;
 
-    public List<CommentResponse> getCommentFromArticleID(long articleID) {
-        List<CommentEntity> commentsEntities = commentRepository.findByArticleID((long) articleID);
+    public List<CommentResponse> getCommentsFromArticleID(long articleID) {
+        List<CommentEntity> commentsEntities = commentRepository.findByArticleID(articleID);
 
         return toCommentResponse(commentsEntities);
     }
+
+    public CommentResponse getComment(long commentID) {
+        CommentEntity commentsEntities = commentRepository.findOne(commentID);
+
+        return toCommentResponse(commentsEntities);
+    }
+
 
     public boolean containsMessage(CommentRequest commentRequest) {
         String message = commentRequest.getMessage();
@@ -31,6 +38,11 @@ public class CommentService {
     public long addNewComments(CommentRequest commentRequest) {
         CommentEntity entity = toCommentEntity(commentRequest);
         return commentRepository.save(entity).getId();
+    }
+    public boolean asAuthor(CommentRequest commentRequest) {
+        CommentEntity entity = toCommentEntity(commentRequest);
+
+        return entity.getAuthor() != null;
     }
 
     public boolean commentExist(long commentID) {
@@ -43,14 +55,15 @@ public class CommentService {
             commentRepository.delete(commentEntity);
         } else {
             commentEntity.setMessage("");
-            commentEntity.setAuthor("");
+            commentEntity.setAuthor(null);
             commentRepository.save(commentEntity);
         }
     }
 
     public long updateComment(long commentID, CommentRequest commentRequest) {
         CommentEntity commentEntity = commentRepository.findOne(commentID);
-        commentEntity.setMessage(commentRequest.getMessage());;
+        commentEntity.setMessage(commentRequest.getMessage());
+
         return commentRepository.save(commentEntity).getId();
     }
 
@@ -67,12 +80,6 @@ public class CommentService {
         return entity;
     }
 
-    private List<CommentEntity> toCommentEntity(List<CommentRequest> comments) {
-        return comments.stream()
-                .map(s -> toCommentEntity(s))
-                .collect(Collectors.toList());
-    }
-
     public CommentResponse toCommentResponse(CommentEntity comment) {
         CommentResponse response = new CommentResponse();
 
@@ -87,6 +94,12 @@ public class CommentService {
             response.setParentID(comment.getParent().getId());
 
         return response;
+    }
+
+    private List<CommentEntity> toCommentEntity(List<CommentRequest> comments) {
+        return comments.stream()
+                .map(s -> toCommentEntity(s))
+                .collect(Collectors.toList());
     }
 
     private List<CommentResponse> toCommentResponse(List<CommentEntity> comments) {

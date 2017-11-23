@@ -3,7 +3,7 @@ package io.lozzikit.discussions.api.endpoints;
 import io.lozzikit.discussions.api.CommentsApi;
 import io.lozzikit.discussions.api.model.CommentRequest;
 import io.lozzikit.discussions.api.model.CommentResponse;
-import io.lozzikit.discussions.api.services.CommentService;
+import io.lozzikit.discussions.services.CommentService;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,22 +28,22 @@ public class CommentsApiController implements CommentsApi {
 
     @Override
     public ResponseEntity<List<CommentResponse>> commentsGet(@NotNull @ApiParam(value = "The articleID the user want to list comment from", required = true) @RequestParam(value = "articleID", required = true) Long articleID) {
-        List<CommentResponse> responses = commentService.getCommentFromArticleID(articleID);
+        List<CommentResponse> responses = commentService.getCommentsFromArticleID(articleID);
 
         return ResponseEntity.ok(responses);
     }
 
     @Override
-    public ResponseEntity<CommentResponse> commentsIdGet(@ApiParam(value = "ID of the comment we want to retrive.", required = true) @PathVariable("id") Integer id,
-                                                  @NotNull @ApiParam(value = "The articleID the user want to list comment from", required = true) @RequestParam(value = "articleID", required = true) Long articleID){
-        return ResponseEntity.ok(new CommentResponse());
+    public ResponseEntity<CommentResponse> commentsIdGet(@ApiParam(value = "ID of the comment we want to retrive.", required = true) @PathVariable("id") Long id) {
+        CommentResponse response = commentService.getComment(id);
+
+        return ResponseEntity.ok(response);
     }
 
     @Override
     public ResponseEntity<Void> commentsIdDelete(@ApiParam(value = "ID of the comment we want to delete", required = true) @PathVariable("id") Long id) {
-        if (!commentService.commentExist(id)) {
+        if (!commentService.commentExist(id))
             return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
-        }
 
         commentService.deleteComment(id);
 
@@ -53,12 +53,12 @@ public class CommentsApiController implements CommentsApi {
     @Override
     public ResponseEntity<Object> commentsIdPut(@ApiParam(value = "ID of the comment we want to edit.", required = true) @PathVariable("id") Long id,
                                                 @ApiParam(value = "The comment the user want to post", required = true) @RequestBody CommentRequest comment) {
-        if (!commentService.commentExist(id)) {
+        if (!commentService.containsMessage(comment))
             return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
-        }
-        if (!commentService.containsMessage(comment)) {
+        if (!commentService.commentExist(id))
             return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
-        }
+        if (!commentService.asAuthor(comment))
+            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
 
         long commentId = commentService.updateComment(id, comment);
 
@@ -71,9 +71,8 @@ public class CommentsApiController implements CommentsApi {
 
     @Override
     public ResponseEntity<Object> commentsPost(@ApiParam(value = "The comment the user want to post", required = true) @RequestBody CommentRequest comment) {
-        if (!commentService.containsMessage(comment)) {
+        if (!commentService.containsMessage(comment))
             return new ResponseEntity<Object>(HttpStatus.UNPROCESSABLE_ENTITY);
-        }
 
         long commentID = commentService.addNewComments(comment);
 

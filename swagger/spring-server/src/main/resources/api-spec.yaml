@@ -63,11 +63,6 @@ paths:
           description: ID of the comment we want to retrive.
           required: true
           type: integer
-        - name: articleID
-          in: query
-          description: The articleID the user want to list comment from
-          required: true
-          type: integer
           format: int64
       tags:
         - Comments
