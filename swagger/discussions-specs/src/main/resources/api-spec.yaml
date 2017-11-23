@@ -24,6 +24,8 @@ paths:
       responses:
         '201':
           description: Comment successfully posted
+          schema:
+            type: object
         default:
           description: Unexpected error
           schema:
@@ -52,6 +54,32 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   '/comments/{id}':
+    get:
+      summary: Get the comments of an article
+      description: The /comments/{id} endpoint allows a user to retreive one comments associated to an article.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the comment we want to retrive.
+          required: true
+          type: integer
+        - name: articleID
+          in: query
+          description: The articleID the user want to list comment from
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - Comments
+      responses:
+        '200':
+          description: The list of the comments
+          schema:
+            $ref: '#/definitions/CommentResponse'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
     put:
       summary: Update a comment
       description: 'The /comments/{id} endpoint allows a user to update a comment.'
@@ -74,7 +102,7 @@ paths:
         '200':
           description: The registered comment
           schema:
-            $ref: '#/definitions/CommentResponse'
+            type: object
         default:
           description: Unexpected error
           schema:
@@ -145,6 +173,10 @@ definitions:
         type: integer
         format: int64
         description: (Optionnal) The ID of the responded comment.
+      children:
+        type: array
+        items:
+          $ref: '#/definitions/CommentResponse'
       id:
         type: integer
         format: int64

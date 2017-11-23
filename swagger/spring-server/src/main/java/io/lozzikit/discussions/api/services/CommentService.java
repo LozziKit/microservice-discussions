@@ -28,9 +28,9 @@ public class CommentService {
         return message != null && !message.isEmpty();
     }
 
-    public void addNewComments(CommentRequest commentRequest) {
+    public long addNewComments(CommentRequest commentRequest) {
         CommentEntity entity = toCommentEntity(commentRequest);
-        commentRepository.save(entity);
+        return commentRepository.save(entity).getId();
     }
 
     public boolean commentExist(long commentID) {
@@ -48,10 +48,10 @@ public class CommentService {
         }
     }
 
-    public void updateComment(long commentID, CommentRequest commentRequest) {
+    public long updateComment(long commentID, CommentRequest commentRequest) {
         CommentEntity commentEntity = commentRepository.findOne(commentID);
         commentEntity.setMessage(commentRequest.getMessage());;
-        commentRepository.save(commentEntity);
+        return commentRepository.save(commentEntity).getId();
     }
 
     private CommentEntity toCommentEntity(CommentRequest comment) {

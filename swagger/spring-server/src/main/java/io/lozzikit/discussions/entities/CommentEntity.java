@@ -26,7 +26,7 @@ public class CommentEntity implements Serializable {
     private Set<CommentEntity> children = new HashSet<>();
 
     @ManyToOne
-    @JoinColumn(name = "comments_id")
+    @JoinColumn(name = "comments_id_children")
     private CommentEntity parent;
 
     private Date date = new Date();
