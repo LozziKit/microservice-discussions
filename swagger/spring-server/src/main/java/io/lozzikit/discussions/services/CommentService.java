@@ -1,4 +1,4 @@
-package io.lozzikit.discussions.api.services;
+package io.lozzikit.discussions.services;
 
 import io.lozzikit.discussions.api.model.CommentRequest;
 import io.lozzikit.discussions.api.model.CommentResponse;

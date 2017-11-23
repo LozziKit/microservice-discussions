@@ -3,7 +3,7 @@ package io.lozzikit.discussions.api.endpoints;
 import io.lozzikit.discussions.api.CommentsApi;
 import io.lozzikit.discussions.api.model.CommentRequest;
 import io.lozzikit.discussions.api.model.CommentResponse;
-import io.lozzikit.discussions.api.services.CommentService;
+import io.lozzikit.discussions.services.CommentService;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
