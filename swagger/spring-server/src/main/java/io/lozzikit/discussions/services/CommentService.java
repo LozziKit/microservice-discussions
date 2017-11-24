@@ -81,7 +81,7 @@ public class CommentService {
         entity.setAuthorID(comment.getAuthorID());
         entity.setMessage(comment.getMessage());
 
-        if (comment.getParentID() != null) {
+        if (comment.getParentID() == null) {
             entity.setRacine(true);
         } else if (entity.getId() == comment.getParentID()) {
             entity.setRacine(true);
@@ -126,28 +126,6 @@ public class CommentService {
     private List<CommentResponse> toCommentResponse(Set<CommentEntity> comments, boolean isTree) {
         return comments.stream()
                 .map(s -> toCommentResponse(s, isTree))
-                .collect(Collectors.toList());
-    }
-
-    private CommentRequest CommentResponseToRequest(CommentResponse response) {
-        CommentRequest commentRequest = new CommentRequest();
-        return commentRequest;
-    }
-
-    private CommentResponse CommentRequestToResponse(CommentRequest request) {
-        CommentResponse commentRequest = new CommentResponse();
-        return commentRequest;
-    }
-
-    private List<CommentRequest> ListCommentResponseToRequest(List<CommentResponse> listResponse) {
-        return listResponse.stream()
-                .map(s -> CommentResponseToRequest(s))
-                .collect(Collectors.toList());
-    }
-
-    private List<CommentResponse> ListCommentRequestToResponse(List<CommentRequest> listRequest) {
-        return listRequest.stream()
-                .map(s -> CommentRequestToResponse(s))
                 .collect(Collectors.toList());
     }
 }
