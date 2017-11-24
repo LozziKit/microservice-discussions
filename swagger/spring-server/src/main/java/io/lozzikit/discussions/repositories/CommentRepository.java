@@ -9,5 +9,7 @@ import java.util.List;
  * Created by Olivier Liechti on 26/07/17.
  */
 public interface CommentRepository extends CrudRepository<CommentEntity, Long>{
-    List<CommentEntity> findByArticleID(long id);
+    List<CommentEntity> findByArticleID(long articleId);
+
+    List<CommentEntity> findByRacineAndArticleID(boolean Racine, long articleId);
 }

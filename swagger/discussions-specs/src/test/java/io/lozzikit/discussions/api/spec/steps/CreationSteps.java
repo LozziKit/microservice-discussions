@@ -98,7 +98,7 @@ public class CreationSteps {
     @When("^I send a GET to the /comments endpoint for article (\\d+)$")
     public void i_send_a_GET_to_the_comments_endpoint_for_article(long arg1) throws Throwable {
         try {
-            lastApiResponse = api.commentsGetWithHttpInfo(arg1);
+            lastApiResponse = api.commentsGetWithHttpInfo(arg1, false);
             commentsResponse = (List<CommentResponse>) lastApiResponse.getData();
             lastApiCallThrewException = false;
             lastApiException = null;

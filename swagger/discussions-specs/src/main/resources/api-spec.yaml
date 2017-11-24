@@ -40,6 +40,11 @@ paths:
           required: true
           type: integer
           format: int64
+        - name: tree
+          in: query
+          description: If the user wants to get a tree representation of the comments
+          type: boolean
+          default: false
       tags:
         - Comments
       responses:
@@ -168,10 +173,10 @@ definitions:
         type: integer
         format: int64
         description: (Optionnal) The ID of the responded comment.
-      children:
-        type: array
-        items:
-          $ref: '#/definitions/CommentResponse'
+      racine:
+        type: boolean
+        default: false
+        description: The comment has no responded comment.
       id:
         type: integer
         format: int64
@@ -180,11 +185,16 @@ definitions:
         type: string
         format: date-time
         description: Display name of product.
+      children:
+        type: array
+        items:
+          $ref: '#/definitions/CommentResponse'
     required:
       - authorID
       - author
       - message
       - articleID
+      - racine
       - id
       - date
   Error:

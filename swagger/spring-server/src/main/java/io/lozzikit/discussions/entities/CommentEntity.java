@@ -22,6 +22,8 @@ public class CommentEntity implements Serializable {
     private String message;
     private long articleID;
 
+    private boolean racine = false;
+
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private Set<CommentEntity> children = new HashSet<>();
 
@@ -89,6 +91,14 @@ public class CommentEntity implements Serializable {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public boolean isRacine() {
+        return racine;
+    }
+
+    public void setRacine(boolean racine) {
+        this.racine = racine;
     }
 
     @Transient
