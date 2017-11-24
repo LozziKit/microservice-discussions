@@ -111,9 +111,10 @@ public class CreationSteps {
         }
     }
 
-    @Then("^I receive a list of the article (\\d+) comments$")
-    public void i_receive_a_list_of_the_article_comments(long arg1) throws Throwable {
+    @Then("^I receive a list of only the article (\\d+) comments$")
+    public void i_receive_a_list_of_only_the_article_comments(long arg1) throws Throwable {
         assertTrue(!commentsResponse.isEmpty());
+        //TODO
     }
 
     public CommentRequest createCommentRequest(
@@ -133,7 +134,7 @@ public class CreationSteps {
         return cr;
     }
 
-    public boolean compareCommentRequestAndCommentResponse(CommentRequest commentRequest, CommentResponse commentResponse){
+    private boolean compareCommentRequestAndCommentResponse(CommentRequest commentRequest, CommentResponse commentResponse){
         System.out.println(commentRequest.getAuthorID() + " " + commentResponse.getAuthorID());
         return  commentRequest.getMessage().equals(commentResponse.getMessage()) &&
                 commentRequest.getArticleID().equals(commentResponse.getArticleID()) &&
