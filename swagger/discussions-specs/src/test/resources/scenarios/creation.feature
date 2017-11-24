@@ -38,12 +38,11 @@ Scenario: receiving a flat list of comments for article 1
   When I send a GET to the /comments endpoint for article 1 with parameter tree equal to 0
   Then I receive a list of only the article 1 comments
   And Every comment has no child
-  
-Scenario: receiving a tree list of comments for article 1
-  Given There are some comment for article 1 on the server
-  And There is at least one answer to a comment
-  When I send a GET to the /comments endpoint for article 1 with parameter tree equal to 1
-  Then I receive a list of only the article 1 comments
-  And 
-  
+
+Scenario: receiving a tree list of comments for article 6
+  Given There are some comment for article 6 on the server
+  And There is at least 1 answer to a comment for article 6
+  When I send a GET to the /comments endpoint for article 6 with parameter tree equal to 1
+  Then I receive a list of only the article 6 comments
+  And I receive a list where some comments have children
   

@@ -12,6 +12,8 @@ import io.lozzikit.discussions.api.dto.CommentResponse;
 import io.lozzikit.discussions.api.spec.helpers.Environment;
 
 import static org.junit.Assert.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,6 +36,7 @@ public class CreationSteps {
     public CreationSteps(Environment environment) {
         this.environment = environment;
         this.api = environment.getApi();
+
     }
 
     @Given("^there is a discussion microservice up$")
@@ -68,7 +71,7 @@ public class CreationSteps {
                 commentRequest.setMessage("");
             }
         } else {
-            commentRequest = createCommentRequest(1, 1, "El papa", "", 1);
+            commentRequest = createCommentRequest(1L, 1L, "El papa", "", 1L);
         }
     }
 
@@ -86,13 +89,13 @@ public class CreationSteps {
 
     @Given("^I have a comment payload for article (\\d+)$")
     public void i_have_a_comment_payload_for_article(long arg1) throws Throwable {
-        commentRequest = createCommentRequest(arg1, 42, "Le pape", "Amen", (long) 1);
+        commentRequest = createCommentRequest(arg1, 42L, "Le pape", "Amen", (long) 1);
     }
 
     @Given("^There are some comment for article (\\d+) on the server$")
-    public void there_are_some_comment_for_article_on_the_server(int arg1) throws Throwable {
-        api.commentsPost(createCommentRequest(arg1, 2, "Guy1", "Hello", 1));
-        api.commentsPost(createCommentRequest(arg1, 3, "Guy2", "How do you do", 1));
+    public void there_are_some_comment_for_article_on_the_server(long arg1) throws Throwable {
+        api.commentsPost(createCommentRequest(arg1, 2L, "Guy1", "Hello", 1L));
+        api.commentsPost(createCommentRequest(arg1, 3L, "Guy2", "How do you do", 1L));
     }
 
     @When("^I send a GET to the /comments endpoint for article (\\d+)$")
@@ -114,15 +117,68 @@ public class CreationSteps {
     @Then("^I receive a list of only the article (\\d+) comments$")
     public void i_receive_a_list_of_only_the_article_comments(long arg1) throws Throwable {
         assertTrue(!commentsResponse.isEmpty());
-        //TODO
+        commentsResponse.forEach((commentResponse -> {
+            assertTrue(commentResponse.getArticleID() == arg1);
+        }));
+    }
+
+
+    @Then("^Every comment has no child$")
+    public void every_comment_has_no_child() throws Throwable {
+        commentsResponse.forEach((commentResponse -> {
+            assertTrue(commentResponse.getChildren() == null || commentResponse.getChildren().size() == 0);
+        }));
+    }
+
+    @When("^I send a GET to the /comments endpoint for article (\\d+) with parameter tree equal to (\\d+)$")
+    public void i_send_a_GET_to_the_comments_endpoint_for_article_with_parameter_tree_equal_to(long arg1, int treeInt) throws Throwable {
+        try {
+            lastApiResponse = api.commentsGetWithHttpInfo(arg1, treeInt == 1);
+            commentsResponse = (List<CommentResponse>) lastApiResponse.getData();
+            lastApiCallThrewException = false;
+            lastApiException = null;
+            lastStatusCode = lastApiResponse.getStatusCode();
+        } catch (ApiException e) {
+            lastApiCallThrewException = true;
+            lastApiResponse = null;
+            lastApiException = e;
+            lastStatusCode = lastApiException.getCode();
+        }
+    }
+
+    @Given("^There is at least (\\d+) answer to a comment for article (\\d+)$")
+    public void there_is_at_least_answer_to_a_comment_for_article(int arg1, long articleId) throws Throwable {
+        // Posting 2 comments
+        CommentRequest comment = createCommentRequest(articleId, 1L, "MonAuthor", "Little message", null);
+        lastApiResponse = api.commentsPostWithHttpInfo(comment);
+
+        // Getting the id from the header
+        String location = ((ArrayList<String>)lastApiResponse.getHeaders().get("Location")).get(0);
+        long id = Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
+
+        CommentRequest commentResponse = createCommentRequest(articleId, 2L, "MonAutreAuteur", "Little message", id);
+        api.commentsPost(commentResponse);
+    }
+
+    @Then("^I receive a list where some comments have children$")
+    public void i_receive_a_list_where_some_comments_have_children() throws Throwable {
+        boolean ok = false;
+
+        for(CommentResponse comment : commentsResponse){
+            if(comment.getChildren() != null && comment.getChildren().size() >= 1){
+                ok = true;
+            }
+        }
+
+        assertTrue(ok);
     }
 
     public CommentRequest createCommentRequest(
-            long articleID,
-            long authorID,
+            Long articleID,
+            Long authorID,
             String author,
             String message,
-            long parentID)
+            Long parentID)
     {
         CommentRequest cr = new CommentRequest();
         cr.setArticleID(articleID);
