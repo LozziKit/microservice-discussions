@@ -41,6 +41,9 @@ public class CommentsApiController implements CommentsApi {
 
     @Override
     public ResponseEntity<CommentResponse> commentsIdGet(@ApiParam(value = "ID of the comment we want to retrive.", required = true) @PathVariable("id") Long id) {
+        if (!commentService.commentExist(id))
+            return new ResponseEntity<CommentResponse>(HttpStatus.NOT_FOUND);
+
         CommentResponse response = commentService.getComment(id);
 
         return ResponseEntity.ok(response);

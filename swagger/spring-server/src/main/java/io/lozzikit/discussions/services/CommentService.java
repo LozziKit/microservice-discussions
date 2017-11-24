@@ -19,7 +19,7 @@ public class CommentService {
     CommentRepository commentRepository;
 
     public List<CommentResponse> getCommentsTreeFromArticleID(long articleID) {
-        List<CommentEntity> commentsEntities = commentRepository.findByRacineAndArticleID(true, articleID);
+        List<CommentEntity> commentsEntities = commentRepository.findByRootAndArticleID(true, articleID);
 
         return toCommentResponse(commentsEntities, true);
     }
@@ -82,12 +82,12 @@ public class CommentService {
         entity.setMessage(comment.getMessage());
 
         if (comment.getParentID() == null) {
-            entity.setRacine(true);
+            entity.setRoot(true);
         } else if (entity.getId() == comment.getParentID()) {
-            entity.setRacine(true);
+            entity.setRoot(true);
         } else {
             entity.setParent(commentRepository.findOne(comment.getParentID()));
-            entity.setRacine(false);
+            entity.setRoot(false);
         }
 
         return entity;
@@ -106,7 +106,7 @@ public class CommentService {
         response.setDate(new DateTime(comment.getDate()));
         response.setId(comment.getId());
         response.setMessage(comment.getMessage());
-        response.setRacine(comment.isRacine());
+        response.setRoot(comment.isRoot());
 
         if (isTree && comment.getChildren() != null)
             response.setChildren(toCommentResponse(comment.getChildren(), isTree));

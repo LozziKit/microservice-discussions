@@ -173,7 +173,7 @@ definitions:
         type: integer
         format: int64
         description: (Optionnal) The ID of the responded comment.
-      racine:
+      root:
         type: boolean
         default: false
         description: The comment has no responded comment.
@@ -194,7 +194,7 @@ definitions:
       - author
       - message
       - articleID
-      - racine
+      - root
       - id
       - date
   Error:

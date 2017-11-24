@@ -22,7 +22,7 @@ public class CommentEntity implements Serializable {
     private String message;
     private long articleID;
 
-    private boolean racine = false;
+    private boolean root = false;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private Set<CommentEntity> children = new HashSet<>();
@@ -93,12 +93,12 @@ public class CommentEntity implements Serializable {
         this.date = date;
     }
 
-    public boolean isRacine() {
-        return racine;
+    public boolean isRoot() {
+        return root;
     }
 
-    public void setRacine(boolean racine) {
-        this.racine = racine;
+    public void setRoot(boolean root) {
+        this.root = root;
     }
 
     @Transient
