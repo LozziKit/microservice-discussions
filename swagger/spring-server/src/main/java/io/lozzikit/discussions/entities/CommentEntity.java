@@ -3,6 +3,7 @@ package io.lozzikit.discussions.entities;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -21,11 +22,15 @@ public class CommentEntity implements Serializable {
     private String message;
     private long articleID;
 
-    @OneToMany
-    private Set<CommentEntity> fils;
+    private boolean root = false;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    private Set<CommentEntity> children = new HashSet<>();
 
     @ManyToOne
+    @JoinColumn(name = "comments_id_children")
     private CommentEntity parent;
+
     private Date date = new Date();
 
     public long getId() {
@@ -72,6 +77,14 @@ public class CommentEntity implements Serializable {
         this.parent = parent;
     }
 
+    public Set<CommentEntity> getChildren() {
+        return children;
+    }
+
+    public void setChildren(Set<CommentEntity> children) {
+        this.children = children;
+    }
+
     public Date getDate() {
         return date;
     }
@@ -80,7 +93,16 @@ public class CommentEntity implements Serializable {
         this.date = date;
     }
 
-    public boolean isLeaf(){
-        return fils.isEmpty();
+    public boolean isRoot() {
+        return root;
+    }
+
+    public void setRoot(boolean root) {
+        this.root = root;
+    }
+
+    @Transient
+    public boolean isLeaf() {
+        return children.isEmpty();
     }
 }

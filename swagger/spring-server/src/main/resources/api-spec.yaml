@@ -7,6 +7,8 @@ host: localhost:8080
 basePath: /api
 schemes:
   - http
+produces:
+  - application/json
 paths:
   /comments:
     post:
@@ -24,6 +26,8 @@ paths:
       responses:
         '201':
           description: Comment successfully posted
+          schema:
+            type: object
         default:
           description: Unexpected error
           schema:
@@ -38,6 +42,11 @@ paths:
           required: true
           type: integer
           format: int64
+        - name: tree
+          in: query
+          description: If the user wants to get a tree representation of the comments
+          type: boolean
+          default: false
       tags:
         - Comments
       responses:
@@ -52,6 +61,27 @@ paths:
           schema:
             $ref: '#/definitions/Error'
   '/comments/{id}':
+    get:
+      summary: Get the comments of an article
+      description: The /comments/{id} endpoint allows a user to retreive one comments associated to an article.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the comment we want to retrive.
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - Comments
+      responses:
+        '200':
+          description: The list of the comments
+          schema:
+            $ref: '#/definitions/CommentResponse'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
     put:
       summary: Update a comment
       description: 'The /comments/{id} endpoint allows a user to update a comment.'
@@ -74,7 +104,7 @@ paths:
         '200':
           description: The registered comment
           schema:
-            $ref: '#/definitions/CommentResponse'
+            type: object
         default:
           description: Unexpected error
           schema:
@@ -145,6 +175,10 @@ definitions:
         type: integer
         format: int64
         description: (Optionnal) The ID of the responded comment.
+      root:
+        type: boolean
+        default: false
+        description: The comment has no responded comment.
       id:
         type: integer
         format: int64
@@ -153,11 +187,16 @@ definitions:
         type: string
         format: date-time
         description: Display name of product.
+      children:
+        type: array
+        items:
+          $ref: '#/definitions/CommentResponse'
     required:
       - authorID
       - author
       - message
       - articleID
+      - root
       - id
       - date
   Error:

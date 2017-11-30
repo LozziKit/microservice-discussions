@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("Duplicates")
@@ -17,8 +18,20 @@ public class CommentService {
     @Autowired
     CommentRepository commentRepository;
 
-    public List<CommentResponse> getCommentFromArticleID(long articleID) {
-        List<CommentEntity> commentsEntities = commentRepository.findByArticleID((long) articleID);
+    public List<CommentResponse> getCommentsTreeFromArticleID(long articleID) {
+        List<CommentEntity> commentsEntities = commentRepository.findByRootAndArticleID(true, articleID);
+
+        return toCommentResponse(commentsEntities, true);
+    }
+
+    public List<CommentResponse> getCommentsFlatFromArticleID(long articleID) {
+        List<CommentEntity> commentsEntities = commentRepository.findByArticleID(articleID);
+
+        return toCommentResponse(commentsEntities, false);
+    }
+
+    public CommentResponse getComment(long commentID) {
+        CommentEntity commentsEntities = commentRepository.findOne(commentID);
 
         return toCommentResponse(commentsEntities);
     }
@@ -28,9 +41,15 @@ public class CommentService {
         return message != null && !message.isEmpty();
     }
 
-    public void addNewComments(CommentRequest commentRequest) {
+    public long addNewComments(CommentRequest commentRequest) {
         CommentEntity entity = toCommentEntity(commentRequest);
-        commentRepository.save(entity);
+        return commentRepository.save(entity).getId();
+    }
+
+    public boolean asAuthor(CommentRequest commentRequest) {
+        CommentEntity entity = toCommentEntity(commentRequest);
+
+        return entity.getAuthor() != null;
     }
 
     public boolean commentExist(long commentID) {
@@ -43,15 +62,16 @@ public class CommentService {
             commentRepository.delete(commentEntity);
         } else {
             commentEntity.setMessage("");
-            commentEntity.setAuthor("");
+            commentEntity.setAuthor(null);
             commentRepository.save(commentEntity);
         }
     }
 
-    public void updateComment(long commentID, CommentRequest commentRequest) {
+    public long updateComment(long commentID, CommentRequest commentRequest) {
         CommentEntity commentEntity = commentRepository.findOne(commentID);
-        commentEntity.setMessage(commentRequest.getMessage());;
-        commentRepository.save(commentEntity);
+        commentEntity.setMessage(commentRequest.getMessage());
+
+        return commentRepository.save(commentEntity).getId();
     }
 
     private CommentEntity toCommentEntity(CommentRequest comment) {
@@ -61,19 +81,23 @@ public class CommentService {
         entity.setAuthorID(comment.getAuthorID());
         entity.setMessage(comment.getMessage());
 
-        if (comment.getParentID() != null)
+        if (comment.getParentID() == null) {
+            entity.setRoot(true);
+        } else if (entity.getId() == comment.getParentID()) {
+            entity.setRoot(true);
+        } else {
             entity.setParent(commentRepository.findOne(comment.getParentID()));
+            entity.setRoot(false);
+        }
 
         return entity;
     }
 
-    private List<CommentEntity> toCommentEntity(List<CommentRequest> comments) {
-        return comments.stream()
-                .map(s -> toCommentEntity(s))
-                .collect(Collectors.toList());
+    public CommentResponse toCommentResponse(CommentEntity comment) {
+        return toCommentResponse(comment, false);
     }
 
-    public CommentResponse toCommentResponse(CommentEntity comment) {
+    public CommentResponse toCommentResponse(CommentEntity comment, boolean isTree) {
         CommentResponse response = new CommentResponse();
 
         response.setArticleID(comment.getArticleID());
@@ -82,6 +106,10 @@ public class CommentService {
         response.setDate(new DateTime(comment.getDate()));
         response.setId(comment.getId());
         response.setMessage(comment.getMessage());
+        response.setRoot(comment.isRoot());
+
+        if (isTree && comment.getChildren() != null)
+            response.setChildren(toCommentResponse(comment.getChildren(), isTree));
 
         if (comment.getParent() != null)
             response.setParentID(comment.getParent().getId());
@@ -89,33 +117,15 @@ public class CommentService {
         return response;
     }
 
-    private List<CommentResponse> toCommentResponse(List<CommentEntity> comments) {
+    private List<CommentResponse> toCommentResponse(List<CommentEntity> comments, boolean isTree) {
         return comments.stream()
-                .map(s -> toCommentResponse(s))
+                .map(s -> toCommentResponse(s, isTree))
                 .collect(Collectors.toList());
     }
 
-    private CommentRequest CommentResponseToRequest(CommentResponse response) {
-        CommentRequest commentRequest = new CommentRequest();
-        return commentRequest;
-    }
-
-    private CommentResponse CommentRequestToResponse(CommentRequest request) {
-        CommentResponse commentRequest = new CommentResponse();
-        return commentRequest;
-    }
-
-    private List<CommentRequest> ListCommentResponseToRequest(List<CommentResponse> listResponse) {
-        return listResponse.stream()
-                .map(s -> CommentResponseToRequest(s))
+    private List<CommentResponse> toCommentResponse(Set<CommentEntity> comments, boolean isTree) {
+        return comments.stream()
+                .map(s -> toCommentResponse(s, isTree))
                 .collect(Collectors.toList());
     }
-
-    private List<CommentResponse> ListCommentRequestToResponse(List<CommentRequest> listRequest) {
-        return listRequest.stream()
-                .map(s -> CommentRequestToResponse(s))
-                .collect(Collectors.toList());
-    }
-
-
 }
