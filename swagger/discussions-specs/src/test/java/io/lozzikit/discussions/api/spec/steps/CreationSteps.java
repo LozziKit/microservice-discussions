@@ -1,6 +1,5 @@
 package io.lozzikit.discussions.api.spec.steps;
 
-import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -11,10 +10,10 @@ import io.lozzikit.discussions.api.dto.CommentRequest;
 import io.lozzikit.discussions.api.dto.CommentResponse;
 import io.lozzikit.discussions.api.spec.helpers.Environment;
 
-import static org.junit.Assert.*;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * Created by Olivier Liechti on 27/07/17.
@@ -66,8 +65,8 @@ public class CreationSteps {
 
     @When("^The payload is an empty comment$")
     public void the_payload_is_an_empty_comment() throws Throwable {
-        if (commentRequest != null){
-            if (!commentRequest.getMessage().isEmpty()){
+        if (commentRequest != null) {
+            if (!commentRequest.getMessage().isEmpty()) {
                 commentRequest.setMessage("");
             }
         } else {
@@ -78,8 +77,8 @@ public class CreationSteps {
     @Then("^The new comment should be in the list$")
     public void the_new_comment_should_be_in_the_list() throws Throwable {
         boolean commentFound = false;
-        for (CommentResponse commentResponse : commentsResponse){
-            if (compareCommentRequestAndCommentResponse(commentRequest, commentResponse)){
+        for (CommentResponse commentResponse : commentsResponse) {
+            if (compareCommentRequestAndCommentResponse(commentRequest, commentResponse)) {
                 commentFound = true;
                 break;
             }
@@ -153,7 +152,7 @@ public class CreationSteps {
         lastApiResponse = api.commentsPostWithHttpInfo(comment);
 
         // Getting the id from the header
-        String location = ((ArrayList<String>)lastApiResponse.getHeaders().get("Location")).get(0);
+        String location = ((ArrayList<String>) lastApiResponse.getHeaders().get("Location")).get(0);
         long id = Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
 
         CommentRequest commentResponse = createCommentRequest(articleId, 2L, "MonAutreAuteur", "Little message", id);
@@ -164,8 +163,8 @@ public class CreationSteps {
     public void i_receive_a_list_where_some_comments_have_children() throws Throwable {
         boolean ok = false;
 
-        for(CommentResponse comment : commentsResponse){
-            if(comment.getChildren() != null && comment.getChildren().size() >= 1){
+        for (CommentResponse comment : commentsResponse) {
+            if (comment.getChildren() != null && comment.getChildren().size() >= 1) {
                 ok = true;
             }
         }
@@ -178,8 +177,7 @@ public class CreationSteps {
             Long authorID,
             String author,
             String message,
-            Long parentID)
-    {
+            Long parentID) {
         CommentRequest cr = new CommentRequest();
         cr.setArticleID(articleID);
         cr.setAuthor(author);
@@ -190,9 +188,9 @@ public class CreationSteps {
         return cr;
     }
 
-    private boolean compareCommentRequestAndCommentResponse(CommentRequest commentRequest, CommentResponse commentResponse){
+    private boolean compareCommentRequestAndCommentResponse(CommentRequest commentRequest, CommentResponse commentResponse) {
         System.out.println(commentRequest.getAuthorID() + " " + commentResponse.getAuthorID());
-        return  commentRequest.getMessage().equals(commentResponse.getMessage()) &&
+        return commentRequest.getMessage().equals(commentResponse.getMessage()) &&
                 commentRequest.getArticleID().equals(commentResponse.getArticleID()) &&
                 commentRequest.getAuthor().equals(commentResponse.getAuthor()) &&
                 commentRequest.getAuthorID().equals(commentResponse.getAuthorID()) &&

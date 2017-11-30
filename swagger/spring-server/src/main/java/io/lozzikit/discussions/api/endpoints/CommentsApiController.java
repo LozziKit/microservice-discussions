@@ -27,11 +27,11 @@ public class CommentsApiController implements CommentsApi {
     CommentService commentService;
 
     @Override
-    public ResponseEntity<List<CommentResponse>> commentsGet( @NotNull @ApiParam(value = "The articleID the user want to list comment from", required = true) @RequestParam(value = "articleID", required = true) Long articleID,
-                                                              @ApiParam(value = "If the user wants to get a tree representation of the comments", defaultValue = "false") @RequestParam(value = "tree", required = false, defaultValue="false") Boolean tree) {
+    public ResponseEntity<List<CommentResponse>> commentsGet(@NotNull @ApiParam(value = "The articleID the user want to list comment from", required = true) @RequestParam(value = "articleID", required = true) Long articleID,
+                                                             @ApiParam(value = "If the user wants to get a tree representation of the comments", defaultValue = "false") @RequestParam(value = "tree", required = false, defaultValue = "false") Boolean tree) {
         List<CommentResponse> responses;
 
-        if(tree)
+        if (tree)
             responses = commentService.getCommentsTreeFromArticleID(articleID);
         else
             responses = commentService.getCommentsFlatFromArticleID(articleID);
