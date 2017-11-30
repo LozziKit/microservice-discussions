@@ -1,5 +1,6 @@
 package io.lozzikit.discussions.api.spec.steps;
 
+import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -171,6 +172,31 @@ public class CreationSteps {
 
         assertTrue(ok);
     }
+
+    @When("^I delete one of them who is a leaf$")
+    public void i_delete_one_of_them_who_is_a_leaf() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^the list should not contain the deleted comment$")
+    public void the_list_should_not_contain_the_deleted_comment() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @When("^I delete one of them who is a not leaf$")
+    public void i_delete_one_of_them_who_is_a_not_leaf() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^the list should contain a comment with no message$")
+    public void the_list_should_contain_a_comment_with_no_message() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
 
     public CommentRequest createCommentRequest(
             Long articleID,
