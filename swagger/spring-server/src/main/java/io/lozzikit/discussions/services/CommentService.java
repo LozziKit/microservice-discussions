@@ -61,7 +61,7 @@ public class CommentService {
         if (commentEntity.isLeaf()) {
             commentRepository.delete(commentEntity);
         } else {
-            commentEntity.setMessage("");
+            commentEntity.setMessage(null);
             commentEntity.setAuthor(null);
             commentRepository.save(commentEntity);
         }
