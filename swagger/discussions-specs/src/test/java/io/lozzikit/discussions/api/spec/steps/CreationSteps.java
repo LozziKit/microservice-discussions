@@ -1,6 +1,5 @@
 package io.lozzikit.discussions.api.spec.steps;
 
-import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -84,10 +83,10 @@ public class CreationSteps {
         commentRequest = createCommentRequest(42L, "Le pape", "Amen");
     }
 
-    @Given("^There are some comment for article (\\d+) on the server$")
-    public void there_are_some_comment_for_article_on_the_server(long articleID) throws Throwable {
-        api.commentsPost(articleID, createCommentRequest(2L, "Guy1", "Hello"), 1L);
-        api.commentsPost(articleID, createCommentRequest(3L, "Guy2", "How do you do"), 1L);
+    @Given("^There are some comments for article (\\d+) on the server$")
+    public void there_are_some_comments_for_article_on_the_server(long articleID) throws Throwable {
+        api.commentsPost(articleID, createCommentRequest(2L, "Guy1", "Hello"), null);
+        api.commentsPost(articleID, createCommentRequest(3L, "Guy2", "How do you do"), null);
     }
 
     @When("^I send a GET to the /comments endpoint for article (\\d+)$")
@@ -165,28 +164,58 @@ public class CreationSteps {
         assertTrue(ok);
     }
 
-    @When("^I delete one of them who is a not leaf$")
-    public void i_delete_one_of_them_who_is_a_not_leaf() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+    @When("^I delete one of them wich is a not leaf in article (\\d+)$")
+    public void i_delete_one_of_them_wich_is_a_not_leaf_in_article(int arg1) throws Throwable {
+        //Getting all comments for article with arg1 id
+        commentsResponse = api.commentsGet((long) arg1, true);
+
+        //Finding the first comment wich is not a leaf
+        for (CommentResponse comment : commentsResponse) {
+            if (!comment.getChildren().isEmpty()) {
+                commentResponse = comment;
+                break;
+            }
+        }
+
+        //Delete the comment
+        api.commentsIdDelete(commentResponse.getId());
+
     }
 
     @Then("^the list should contain the deleted comment with no message$")
     public void the_list_should_contain_the_deleted_comment_with_no_message() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+        boolean exists = false;
+        for (CommentResponse comment : commentsResponse) {
+            if (comment.getId() == commentResponse.getId()) {
+                exists = true;
+                assertNull(comment.getMessage());
+            }
+        }
+
+        assertTrue(exists);
     }
 
-    @When("^I delete one of them who is a leaf$")
-    public void i_delete_one_of_them_who_is_a_leaf() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+    @When("^I delete one of them wich is a leaf in article (\\d+)$")
+    public void i_delete_one_of_them_wich_is_a_leaf_in_article(int arg1) throws Throwable {
+        //Getting all comments for article with arg1 id
+        commentsResponse = api.commentsGet((long) arg1, true);
+
+        //Finding the first comment wich is not a leaf
+        CommentResponse comment = commentsResponse.get(0);
+        List<CommentResponse> children = comment.getChildren();
+
+        while (!children.isEmpty()) {
+            comment = children.get(0);
+            children = comment.getChildren();
+        }
+
+        //Delete the comment
+        api.commentsIdDelete(comment.getId());
     }
 
     @Then("^the list should not contain the deleted comment$")
     public void the_list_should_not_contain_the_deleted_comment() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
+        assertFalse(commentsResponse.contains(commentResponse));
     }
 
     public CommentRequest createCommentRequest(
@@ -202,7 +231,6 @@ public class CreationSteps {
     }
 
     private boolean compareCommentRequestAndCommentResponse(CommentRequest commentRequest, CommentResponse commentResponse) {
-        System.out.println(commentRequest.getAuthorID() + " " + commentResponse.getAuthorID());
         return commentRequest.getMessage().equals(commentResponse.getMessage()) &&
                 commentRequest.getAuthor().equals(commentResponse.getAuthor()) &&
                 commentRequest.getAuthorID().equals(commentResponse.getAuthorID());
