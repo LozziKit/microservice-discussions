@@ -49,11 +49,15 @@ public class CommentService {
         return commentRepository.save(entity).getId();
     }
 
-    public boolean asAuthor(CommentRequest commentRequest) {
+    public boolean asSameAuthor(long commentID, CommentRequest commentRequest) {
+        CommentEntity commentEntity = commentRepository.findOne(commentID);
 
-        return commentRequest.getAuthor() != null;
+        return commentEntity.getAuthorID() == commentRequest.getAuthorID();
     }
 
+    public boolean commentIsDeleted(long id){
+        return commentRepository.findOne(id).isDeleted();
+    }
     public boolean commentExist(long commentID) {
         return commentRepository.exists(commentID);
     }
@@ -65,6 +69,7 @@ public class CommentService {
         } else {
             commentEntity.setMessage(null);
             commentEntity.setAuthor(null);
+            commentEntity.setDeleted(true);
             commentRepository.save(commentEntity);
         }
     }

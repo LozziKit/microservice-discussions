@@ -67,7 +67,9 @@ public class CommentsApiController implements CommentsApi {
             return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
         if (!commentService.commentExist(id))
             return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
-        if (!commentService.asAuthor(comment))
+        if(commentService.commentIsDeleted(id))
+            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
+        if (!commentService.asSameAuthor(id, comment))
             return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
 
         long commentId = commentService.updateComment(id, comment);

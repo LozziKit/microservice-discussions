@@ -23,6 +23,7 @@ public class CommentEntity implements Serializable {
     private long articleID;
 
     private boolean root = false;
+    private boolean deleted = false;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private Set<CommentEntity> children = new HashSet<>();
@@ -32,6 +33,9 @@ public class CommentEntity implements Serializable {
     private CommentEntity parent;
 
     private Date date = new Date();
+
+    public CommentEntity() {
+    }
 
     public long getId() {
         return id;
@@ -99,6 +103,14 @@ public class CommentEntity implements Serializable {
 
     public void setRoot(boolean root) {
         this.root = root;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     @Transient
