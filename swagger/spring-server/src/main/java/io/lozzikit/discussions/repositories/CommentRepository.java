@@ -11,5 +11,5 @@ import java.util.List;
 public interface CommentRepository extends CrudRepository<CommentEntity, Long> {
     List<CommentEntity> findByArticleID(long articleId);
 
-    List<CommentEntity> findByRootAndArticleID(boolean root, long articleId);
+    List<CommentEntity> findByRootAndArticleID(boolean root, long articleID);
 }

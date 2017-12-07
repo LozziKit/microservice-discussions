@@ -40,7 +40,8 @@ public class CommentsApiController implements CommentsApi {
     }
 
     @Override
-    public ResponseEntity<CommentResponse> commentsIdGet(@ApiParam(value = "ID of the comment we want to retrive.", required = true) @PathVariable("id") Long id) {
+    public ResponseEntity<CommentResponse> commentsIdGet(@ApiParam(value = "ID of the comment we want to retrive.",required=true ) @PathVariable("id") Long id)
+    {
         if (!commentService.commentExist(id))
             return new ResponseEntity<CommentResponse>(HttpStatus.NOT_FOUND);
 
@@ -72,22 +73,31 @@ public class CommentsApiController implements CommentsApi {
         long commentId = commentService.updateComment(id, comment);
 
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(commentId).toUri();
+                .fromCurrentRequest()
+                .path("/" + commentId)
+                .build()
+                .toUri();
 
         return ResponseEntity.created(location).build();
     }
 
     @Override
-    public ResponseEntity<Object> commentsPost(@ApiParam(value = "The comment the user want to post", required = true) @RequestBody CommentRequest comment) {
+    public ResponseEntity<Object> commentsPost(@NotNull @ApiParam(value = "The ID of the associated article.", required = true) @RequestParam(value = "articleID", required = true) Long articleID,
+                                        @ApiParam(value = "The comment the user want to post", required = true) @RequestBody CommentRequest comment,
+                                        @ApiParam(value = "(Optionnal) The ID of the responded comment.") @RequestParam(value = "parentID", required = false) Long parentID)
+    {
         if (!commentService.containsMessage(comment))
             return new ResponseEntity<Object>(HttpStatus.UNPROCESSABLE_ENTITY);
 
-        long commentID = commentService.addNewComments(comment);
+        System.out.println("parentID : " + parentID);
+
+        long commentID = commentService.addNewComments(comment, articleID, parentID);
 
         URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest().path("/{id}")
-                .buildAndExpand(commentID).toUri();
+                .fromCurrentRequestUri()
+                .path("/{id}")
+                .buildAndExpand(commentID)
+                .toUri();
 
         return ResponseEntity.created(location).build();
     }

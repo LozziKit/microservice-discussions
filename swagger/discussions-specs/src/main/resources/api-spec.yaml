@@ -7,16 +7,25 @@ host: localhost:8080
 basePath: /api
 schemes:
   - http
-produces:
-  - application/json
 paths:
   /comments:
     post:
       summary: Register a comment
       description: The /comments endpoint allows a user to register a comment to an article or another comment of an article.
       parameters:
-        - name: comment
-          in: body
+        - in: query
+          name: articleID
+          type: integer
+          format: int64
+          required: true
+          description: The ID of the associated article.
+        - in: query
+          name: parentID
+          type: integer
+          format: int64
+          description: (Optionnal) The ID of the responded comment.
+        - in: body
+          name: comment
           description: The comment the user want to post
           required: true
           schema:
@@ -44,7 +53,8 @@ paths:
           format: int64
         - name: tree
           in: query
-          description: If the user wants to get a tree representation of the comments
+          description: Define the way we want to retrive all the comments
+          required: false
           type: boolean
           default: false
       tags:
@@ -135,7 +145,6 @@ definitions:
       - authorID
       - author
       - message
-      - articleID
     properties:
       authorID:
         type: integer
@@ -147,14 +156,6 @@ definitions:
       message:
         type: string
         description: The content of the comment.
-      articleID:
-        type: integer
-        format: int64
-        description: The ID of the associated article.
-      parentID:
-        type: integer
-        format: int64
-        description: (Optionnal) The ID of the responded comment.
   CommentResponse:
     properties:
       authorID:
@@ -177,8 +178,7 @@ definitions:
         description: (Optionnal) The ID of the responded comment.
       root:
         type: boolean
-        default: false
-        description: The comment has no responded comment.
+        description: If a comment as no response
       id:
         type: integer
         format: int64

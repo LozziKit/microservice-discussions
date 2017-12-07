@@ -4,8 +4,8 @@ Feature: Creation of a discussion
     Given there is a discussion microservice up
 
   Scenario: create a new comment for article 1
-    Given I have a comment payload for article 1
-    When I POST it to the /comments endpoint
+    Given I have a comment payload
+    When I POST it to the /comments endpoint for the article 1
     Then I receive a 201 status code
 
   Scenario: getting all comments of article 1
@@ -14,22 +14,22 @@ Feature: Creation of a discussion
     Then I receive a list of only the article 1 comments
 
   Scenario: check that the comment has been written
-    Given I have a comment payload for article 2
-    When I POST it to the /comments endpoint
+    Given I have a comment payload
+    When I POST it to the /comments endpoint for the article 2
     And I send a GET to the /comments endpoint for article 2
     Then The new comment should be in the list
 
   Scenario: not create a new comment if it is empty
-    Given I have a comment payload for article 3
+    Given I have a comment payload
     When The payload is an empty comment
-    And I POST it to the /comments endpoint
+    And I POST it to the /comments endpoint for the article 3
     Then I receive a 422 status code
 
-  Scenario: check that the comment has been written to the rignt article
-    Given I have a comment payload for article 1
-    And I POST it to the /comments endpoint
-    And I have a comment payload for article 2
-    And I POST it to the /comments endpoint
+  Scenario: check that the comment has been written to the right article
+    Given I have a comment payload
+    And I POST it to the /comments endpoint for article 1
+    And I have a comment payload
+    And I POST it to the /comments endpoint for article 2
     When I send a GET to the /comments endpoint for article 2
     Then I receive a list of only the article 2 comments
 
@@ -47,16 +47,10 @@ Feature: Creation of a discussion
     And I receive a list where some comments have children
 
   Scenario: delete a comment for article 1
-    Given I have a comment payload for article 1
-    When I POST it to the /comments endpoint
-
-    Then I receive a 201 status code
-
-  Scenario: delete a comment for article 1
     Given There are some comment for article 1 on the server
     When I delete one of them who is a not leaf
     And I send a GET to the /comments endpoint for article 1
-    Then the list should contain a comment with no message
+    Then the list should contain the deleted comment with no message
 
   Scenario: delete a leaf comment for article 1
     Given There are some comment for article 1 on the server

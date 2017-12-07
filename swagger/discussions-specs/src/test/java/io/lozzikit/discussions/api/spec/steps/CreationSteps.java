@@ -44,19 +44,14 @@ public class CreationSteps {
         assertNotNull(api);
     }
 
-    @When("^I POST it to the /comments endpoint$")
-    public void i_POST_it_to_the_comments_endpoint() throws Throwable {
-        try {
-            lastApiResponse = api.commentsPostWithHttpInfo(commentRequest);
-            lastApiCallThrewException = false;
-            lastApiException = null;
-            lastStatusCode = lastApiResponse.getStatusCode();
-        } catch (ApiException e) {
-            lastApiCallThrewException = true;
-            lastApiResponse = null;
-            lastApiException = e;
-            lastStatusCode = lastApiException.getCode();
-        }
+    @Given("^I POST it to the /comments endpoint for the article (\\d+)$")
+    public void i_POST_it_to_the_comments_endpoint_for_the_article(long articleID) throws Throwable {
+        postMessage(articleID, null);
+    }
+
+    @When("^I POST it to the /comments endpoint for article (\\d+)$")
+    public void i_POST_it_to_the_comments_endpoint_for_article(long articleID) throws Throwable {
+        postMessage(articleID, null);
     }
 
     @Then("^I receive a (\\d+) status code$")
@@ -66,13 +61,10 @@ public class CreationSteps {
 
     @When("^The payload is an empty comment$")
     public void the_payload_is_an_empty_comment() throws Throwable {
-        if (commentRequest != null) {
-            if (!commentRequest.getMessage().isEmpty()) {
-                commentRequest.setMessage("");
-            }
-        } else {
-            commentRequest = createCommentRequest(1L, 1L, "El papa", "", 1L);
-        }
+        if (commentRequest != null)
+            commentRequest.setMessage("");
+        else
+            commentRequest = createCommentRequest(1L, "El papa", "");
     }
 
     @Then("^The new comment should be in the list$")
@@ -87,21 +79,21 @@ public class CreationSteps {
         assertTrue(commentFound);
     }
 
-    @Given("^I have a comment payload for article (\\d+)$")
-    public void i_have_a_comment_payload_for_article(long arg1) throws Throwable {
-        commentRequest = createCommentRequest(arg1, 42L, "Le pape", "Amen", (long) 1);
+    @Given("^I have a comment payload$")
+    public void i_have_a_comment_payload() throws Throwable {
+        commentRequest = createCommentRequest(42L, "Le pape", "Amen");
     }
 
     @Given("^There are some comment for article (\\d+) on the server$")
-    public void there_are_some_comment_for_article_on_the_server(long arg1) throws Throwable {
-        api.commentsPost(createCommentRequest(arg1, 2L, "Guy1", "Hello", 1L));
-        api.commentsPost(createCommentRequest(arg1, 3L, "Guy2", "How do you do", 1L));
+    public void there_are_some_comment_for_article_on_the_server(long articleID) throws Throwable {
+        api.commentsPost(articleID, createCommentRequest(2L, "Guy1", "Hello"), 1L);
+        api.commentsPost(articleID, createCommentRequest(3L, "Guy2", "How do you do"), 1L);
     }
 
     @When("^I send a GET to the /comments endpoint for article (\\d+)$")
-    public void i_send_a_GET_to_the_comments_endpoint_for_article(long arg1) throws Throwable {
+    public void i_send_a_GET_to_the_comments_endpoint_for_article(long articleID) throws Throwable {
         try {
-            lastApiResponse = api.commentsGetWithHttpInfo(arg1, false);
+            lastApiResponse = api.commentsGetWithHttpInfo(articleID, false);
             commentsResponse = (List<CommentResponse>) lastApiResponse.getData();
             lastApiCallThrewException = false;
             lastApiException = null;
@@ -115,10 +107,10 @@ public class CreationSteps {
     }
 
     @Then("^I receive a list of only the article (\\d+) comments$")
-    public void i_receive_a_list_of_only_the_article_comments(long arg1) throws Throwable {
+    public void i_receive_a_list_of_only_the_article_comments(long articleID) throws Throwable {
         assertTrue(!commentsResponse.isEmpty());
         commentsResponse.forEach((commentResponse -> {
-            assertTrue(commentResponse.getArticleID() == arg1);
+            assertTrue(commentResponse.getArticleID() == articleID);
         }));
     }
 
@@ -131,9 +123,9 @@ public class CreationSteps {
     }
 
     @When("^I send a GET to the /comments endpoint for article (\\d+) with parameter tree equal to (\\d+)$")
-    public void i_send_a_GET_to_the_comments_endpoint_for_article_with_parameter_tree_equal_to(long arg1, int treeInt) throws Throwable {
+    public void i_send_a_GET_to_the_comments_endpoint_for_article_with_parameter_tree_equal_to(long articleID, int treeInt) throws Throwable {
         try {
-            lastApiResponse = api.commentsGetWithHttpInfo(arg1, treeInt == 1);
+            lastApiResponse = api.commentsGetWithHttpInfo(articleID, treeInt == 1);
             commentsResponse = (List<CommentResponse>) lastApiResponse.getData();
             lastApiCallThrewException = false;
             lastApiException = null;
@@ -147,17 +139,17 @@ public class CreationSteps {
     }
 
     @Given("^There is at least (\\d+) answer to a comment for article (\\d+)$")
-    public void there_is_at_least_answer_to_a_comment_for_article(int arg1, long articleId) throws Throwable {
+    public void there_is_at_least_answer_to_a_comment_for_article(int arg1, long articleID) throws Throwable {
         // Posting 2 comments
-        CommentRequest comment = createCommentRequest(articleId, 1L, "MonAuthor", "Little message", null);
-        lastApiResponse = api.commentsPostWithHttpInfo(comment);
+        CommentRequest comment = createCommentRequest(1L, "MonAuthor", "Little message");
+        lastApiResponse = api.commentsPostWithHttpInfo(articleID, comment, null);
 
         // Getting the id from the header
         String location = ((ArrayList<String>) lastApiResponse.getHeaders().get("Location")).get(0);
         long id = Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
 
-        CommentRequest commentResponse = createCommentRequest(articleId, 2L, "MonAutreAuteur", "Little message", id);
-        api.commentsPost(commentResponse);
+        CommentRequest commentResponse = createCommentRequest(2L, "MonAutreAuteur", "Little message");
+        api.commentsPostWithHttpInfo(articleID, commentResponse, id);
     }
 
     @Then("^I receive a list where some comments have children$")
@@ -173,6 +165,18 @@ public class CreationSteps {
         assertTrue(ok);
     }
 
+    @When("^I delete one of them who is a not leaf$")
+    public void i_delete_one_of_them_who_is_a_not_leaf() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^the list should contain the deleted comment with no message$")
+    public void the_list_should_contain_the_deleted_comment_with_no_message() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
     @When("^I delete one of them who is a leaf$")
     public void i_delete_one_of_them_who_is_a_leaf() throws Throwable {
         // Write code here that turns the phrase above into concrete actions
@@ -185,31 +189,14 @@ public class CreationSteps {
         throw new PendingException();
     }
 
-    @When("^I delete one of them who is a not leaf$")
-    public void i_delete_one_of_them_who_is_a_not_leaf() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
-    }
-
-    @Then("^the list should contain a comment with no message$")
-    public void the_list_should_contain_a_comment_with_no_message() throws Throwable {
-        // Write code here that turns the phrase above into concrete actions
-        throw new PendingException();
-    }
-
-
     public CommentRequest createCommentRequest(
-            Long articleID,
             Long authorID,
             String author,
-            String message,
-            Long parentID) {
+            String message) {
         CommentRequest cr = new CommentRequest();
-        cr.setArticleID(articleID);
         cr.setAuthor(author);
         cr.setAuthorID(authorID);
         cr.setMessage(message);
-        cr.setParentID(parentID);
 
         return cr;
     }
@@ -217,9 +204,21 @@ public class CreationSteps {
     private boolean compareCommentRequestAndCommentResponse(CommentRequest commentRequest, CommentResponse commentResponse) {
         System.out.println(commentRequest.getAuthorID() + " " + commentResponse.getAuthorID());
         return commentRequest.getMessage().equals(commentResponse.getMessage()) &&
-                commentRequest.getArticleID().equals(commentResponse.getArticleID()) &&
                 commentRequest.getAuthor().equals(commentResponse.getAuthor()) &&
-                commentRequest.getAuthorID().equals(commentResponse.getAuthorID()) &&
-                commentRequest.getParentID().equals(commentResponse.getParentID());
+                commentRequest.getAuthorID().equals(commentResponse.getAuthorID());
+    }
+
+    private void postMessage(long articleID, Long parentID) {
+        try {
+            lastApiResponse = api.commentsPostWithHttpInfo(articleID, commentRequest, parentID);
+            lastApiCallThrewException = false;
+            lastApiException = null;
+            lastStatusCode = lastApiResponse.getStatusCode();
+        } catch (ApiException e) {
+            lastApiCallThrewException = true;
+            lastApiResponse = null;
+            lastApiException = e;
+            lastStatusCode = lastApiException.getCode();
+        }
     }
 }

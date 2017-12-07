@@ -38,18 +38,20 @@ public class CommentService {
 
     public boolean containsMessage(CommentRequest commentRequest) {
         String message = commentRequest.getMessage();
+
         return message != null && !message.isEmpty();
     }
 
-    public long addNewComments(CommentRequest commentRequest) {
-        CommentEntity entity = toCommentEntity(commentRequest);
+    public long addNewComments(CommentRequest commentRequest, long articleID, Long parentID) {
+        System.out.println("parentID : " + parentID);
+        CommentEntity entity = toCommentEntity(commentRequest, articleID,  parentID);
+
         return commentRepository.save(entity).getId();
     }
 
     public boolean asAuthor(CommentRequest commentRequest) {
-        CommentEntity entity = toCommentEntity(commentRequest);
 
-        return entity.getAuthor() != null;
+        return commentRequest.getAuthor() != null;
     }
 
     public boolean commentExist(long commentID) {
@@ -74,19 +76,21 @@ public class CommentService {
         return commentRepository.save(commentEntity).getId();
     }
 
-    private CommentEntity toCommentEntity(CommentRequest comment) {
+    private CommentEntity toCommentEntity(CommentRequest comment, long articleID, Long parentID) {
         CommentEntity entity = new CommentEntity();
-        entity.setArticleID(comment.getArticleID());
+        entity.setArticleID(articleID);
         entity.setAuthor(comment.getAuthor());
         entity.setAuthorID(comment.getAuthorID());
         entity.setMessage(comment.getMessage());
 
-        if (comment.getParentID() == null) {
+        System.out.println("parentID : " + parentID);
+
+        if (parentID == null) {
             entity.setRoot(true);
-        } else if (entity.getId() == comment.getParentID()) {
+        } else if (entity.getId() == parentID) {
             entity.setRoot(true);
         } else {
-            entity.setParent(commentRepository.findOne(comment.getParentID()));
+            entity.setParent(commentRepository.findOne(parentID));
             entity.setRoot(false);
         }
 
