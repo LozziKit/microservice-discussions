@@ -44,9 +44,13 @@ public class CommentService {
 
     public long addNewComments(CommentRequest commentRequest, long articleID, Long parentID) {
         System.out.println("parentID : " + parentID);
-        CommentEntity entity = toCommentEntity(commentRequest, articleID,  parentID);
+        CommentEntity entity = toCommentEntity(commentRequest, articleID, parentID);
 
         return commentRepository.save(entity).getId();
+    }
+
+    public boolean asAuthor(CommentRequest commentRequest) {
+        return commentRequest.getAuthorID() != null;
     }
 
     public boolean asSameAuthor(long commentID, CommentRequest commentRequest) {
@@ -55,9 +59,10 @@ public class CommentService {
         return commentEntity.getAuthorID() == commentRequest.getAuthorID();
     }
 
-    public boolean commentIsDeleted(long id){
+    public boolean commentIsDeleted(long id) {
         return commentRepository.findOne(id).isDeleted();
     }
+
     public boolean commentExist(long commentID) {
         return commentRepository.exists(commentID);
     }

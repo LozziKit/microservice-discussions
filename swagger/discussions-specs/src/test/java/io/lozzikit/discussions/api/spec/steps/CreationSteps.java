@@ -1,5 +1,6 @@
 package io.lozzikit.discussions.api.spec.steps;
 
+import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -31,6 +32,7 @@ public class CreationSteps {
     private ApiException lastApiException;
     private boolean lastApiCallThrewException;
     private int lastStatusCode;
+    private long commentID;
 
     public CreationSteps(Environment environment) {
         this.environment = environment;
@@ -140,15 +142,11 @@ public class CreationSteps {
     @Given("^There is at least (\\d+) answer to a comment for article (\\d+)$")
     public void there_is_at_least_answer_to_a_comment_for_article(int arg1, long articleID) throws Throwable {
         // Posting 2 comments
-        CommentRequest comment = createCommentRequest(1L, "MonAuthor", "Little message");
-        lastApiResponse = api.commentsPostWithHttpInfo(articleID, comment, null);
+        commentRequest = createCommentRequest(1L, "MonAuthor", "Little message");
+        postMessage(articleID, null);
 
-        // Getting the id from the header
-        String location = ((ArrayList<String>) lastApiResponse.getHeaders().get("Location")).get(0);
-        long id = Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
-
-        CommentRequest commentResponse = createCommentRequest(2L, "MonAutreAuteur", "Little message");
-        api.commentsPostWithHttpInfo(articleID, commentResponse, id);
+        commentRequest = createCommentRequest(2L, "MonAutreAuteur", "Little response");
+        postMessage(articleID, commentID);
     }
 
     @Then("^I receive a list where some comments have children$")
@@ -218,6 +216,48 @@ public class CreationSteps {
         assertFalse(commentsResponse.contains(commentResponse));
     }
 
+    @Given("^I have the id of a comment that does not exist$")
+    public void i_have_the_id_of_a_comment_that_does_not_exist() throws Throwable {
+        commentID = -1;
+    }
+
+    @When("^I try to modify the comment$")
+    public void i_try_to_modify_the_comment() throws Throwable {
+        try {
+            lastApiResponse = api.commentsIdPutWithHttpInfo(commentID, commentRequest);
+            commentsResponse = (List<CommentResponse>) lastApiResponse.getData();
+            lastApiCallThrewException = false;
+            lastApiException = null;
+            lastStatusCode = lastApiResponse.getStatusCode();
+        } catch (ApiException e) {
+            lastApiCallThrewException = true;
+            lastApiResponse = null;
+            lastApiException = e;
+            lastStatusCode = lastApiException.getCode();
+        }
+    }
+
+    @Given("^I have a empty comment payload$")
+    public void i_have_a_empty_comment_payload() throws Throwable {
+        commentRequest = createCommentRequest(1L, "Basile", "");
+    }
+
+    @Given("^The author (\\d+) posted a comment for article (\\d+) on the server$")
+    public void the_author_posted_a_comment_for_article_on_the_server(long authorID, long articleID) throws Throwable {
+        commentRequest = createCommentRequest(authorID, "Basile", "Coucou <3");
+        postMessage(articleID, null);
+    }
+
+    @Given("^I have a comment payload without author$")
+    public void i_have_a_comment_payload_without_author() throws Throwable {
+        commentRequest = createCommentRequest(null, null, "Coucou <3");
+    }
+
+    @Given("^I have a comment payload from the author (\\d+)$")
+    public void i_have_a_comment_payload_from_the_author(long authorID) throws Throwable {
+        commentRequest = createCommentRequest(authorID, "Bob", "Je suis un auteur");
+    }
+
     public CommentRequest createCommentRequest(
             Long authorID,
             String author,
@@ -242,6 +282,8 @@ public class CreationSteps {
             lastApiCallThrewException = false;
             lastApiException = null;
             lastStatusCode = lastApiResponse.getStatusCode();
+            String location = ((ArrayList<String>) lastApiResponse.getHeaders().get("Location")).get(0);
+            commentID = Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
         } catch (ApiException e) {
             lastApiCallThrewException = true;
             lastApiResponse = null;

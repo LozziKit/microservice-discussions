@@ -59,3 +59,39 @@ Feature: Creation of a discussion
     And I send a GET to the /comments endpoint for article 2
     Then the list should not contain the deleted comment
 
+  Scenario: Modifying a comment that does not exist
+    Given I have the id of a comment that does not exist
+    And I have a comment payload
+    When I try to modify the comment
+    Then I receive a 404 status code
+
+  Scenario: Modifying a comment with an empty comment
+    Given There are some comments for article 10 on the server
+    And I have a empty comment payload
+    When I try to modify the comment
+    Then I receive a 400 status code
+
+  Scenario: Modifying a deleted comment which is not a leaf
+    Given The author 3 posted a comment for article 11 on the server
+    And There is at least 1 answer to a comment for article 11
+    And I have a comment payload
+    When I try to modify the comment
+    Then I receive a 403 status code
+
+  Scenario: Modifying a comment with a payload that does not contain an author
+    Given The author 3 posted a comment for article 12 on the server
+    And I have a comment payload without author
+    When I try to modify the comment
+    Then I receive a 400 status code
+
+  Scenario: Modifying a comment which i'm not the author
+    Given The author 3 posted a comment for article 13 on the server
+    And I have a comment payload from the author 2
+    When I try to modify the comment
+    Then I receive a 403 status code
+
+  Scenario: Modifying a comment
+    Given The author 3 posted a comment for article 14 on the server
+    And I have a comment payload from the author 3
+    When I try to modify the comment
+    Then I receive a 201 status code

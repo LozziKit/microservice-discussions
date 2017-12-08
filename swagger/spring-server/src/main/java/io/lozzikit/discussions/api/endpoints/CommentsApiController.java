@@ -64,13 +64,15 @@ public class CommentsApiController implements CommentsApi {
     public ResponseEntity<Object> commentsIdPut(@ApiParam(value = "ID of the comment we want to edit.", required = true) @PathVariable("id") Long id,
                                                 @ApiParam(value = "The comment the user want to post", required = true) @RequestBody CommentRequest comment) {
         if (!commentService.containsMessage(comment))
-            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST);
         if (!commentService.commentExist(id))
             return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
         if(commentService.commentIsDeleted(id))
             return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
+        if (!commentService.asAuthor(comment))
+            return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST);
         if (!commentService.asSameAuthor(id, comment))
-            return new ResponseEntity<Object>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<Object>(HttpStatus.FORBIDDEN);
 
         long commentId = commentService.updateComment(id, comment);
 
