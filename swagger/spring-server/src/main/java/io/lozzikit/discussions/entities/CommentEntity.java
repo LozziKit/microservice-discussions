@@ -34,6 +34,8 @@ public class CommentEntity implements Serializable {
 
     private Date date = new Date();
 
+    private Set<Long> upvoters = new HashSet<>();
+
     public CommentEntity() {
     }
 
@@ -117,4 +119,10 @@ public class CommentEntity implements Serializable {
     public boolean isLeaf() {
         return children.isEmpty();
     }
+
+    public Set<Long> getUpvoters() { return upvoters; }
+
+    public void setUpvoters(Set<Long> upvoters) { this.upvoters = upvoters; }
+
+    public void addUpvoter(Long upvoter) { upvoters.add(upvoter); }
 }

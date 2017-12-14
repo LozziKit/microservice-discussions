@@ -131,6 +131,23 @@ public class CommentService {
         return response;
     }
 
+    public boolean containsUpvoter(Long commentID, CommentRequest commentRequest) {
+        CommentEntity comment = commentRepository.findOne(commentID);
+        Set<Long> upvoters = comment.getUpvoters();
+        return upvoters.contains(commentRequest.getAuthorID());
+    }
+
+    public long getNbrUpvotes(Long commentID) {
+        CommentEntity comment = commentRepository.findOne(commentID);
+        return comment.getUpvoters().size();
+    }
+
+    public long addUpvote(Long commentID, Long authorID) {
+        CommentEntity comment = commentRepository.findOne(commentID);
+        comment.addUpvoter(authorID);
+        return  commentRepository.save(comment).getId();
+    }
+
     private List<CommentResponse> toCommentResponse(List<CommentEntity> comments, boolean isTree) {
         return comments.stream()
                 .map(s -> toCommentResponse(s, isTree))

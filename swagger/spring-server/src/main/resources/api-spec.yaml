@@ -138,6 +138,57 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  '/comments/{id}/upvote':
+    get:
+      summary: Get the number of upvotes for a particular comment
+      description: The /comments/{id}/upvote endpoint allows a user to retreive the number of upvotes of a comment associated to an article.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the comment having the upvotes we're interessted in.
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - Comments
+      responses:
+        '200':
+          description: The number of upvotes associated to the comment
+          schema: 
+            type: integer
+            format: int64
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: Add an upvote to the comment
+      description: The /comments/{api}/upvote endpoint allows a user to add an upvote to a comment of an article.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the comment we want to upvote.
+          required: true
+          type: integer
+          format: int64
+        - name: author
+          in: body
+          description: The user who upvotes the comment
+          required: true
+          schema:
+            $ref: '#/definitions/CommentRequest'
+      tags:
+        - Comments
+      responses:
+        '201':
+          description: Comment successfully upvoted
+          schema:
+            type: integer
+            format: int64
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 definitions:
   CommentRequest:
     type: object

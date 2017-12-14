@@ -86,6 +86,34 @@ public class CommentsApiController implements CommentsApi {
     }
 
     @Override
+    public ResponseEntity<Long> commentsIdUpvoteGet(@ApiParam(value = "ID of the comment having the upvotes we're interessted in.",required=true ) @PathVariable("id") Long id) {
+        if (!commentService.commentExist(id))
+            return new ResponseEntity<Long>(HttpStatus.NOT_FOUND);
+        if (commentService.commentIsDeleted(id))
+            return new ResponseEntity<Long>(HttpStatus.FORBIDDEN);
+
+        return ResponseEntity.ok(commentService.getNbrUpvotes(id));
+    }
+
+    @Override
+    public ResponseEntity<Long> commentsIdUpvotePost(@ApiParam(value = "ID of the comment we want to upvote.",required=true ) @PathVariable("id") Long id,
+                                              @ApiParam(value = "The user who upvotes the comment" ,required=true ) @RequestBody CommentRequest author) {
+        if (!commentService.commentExist(id))
+            return new ResponseEntity<Long>(HttpStatus.NOT_FOUND);
+        if (author.getAuthorID() == null)
+            return new ResponseEntity<Long>(HttpStatus.BAD_REQUEST);
+        if (commentService.commentIsDeleted(id))
+            return new ResponseEntity<Long>(HttpStatus.FORBIDDEN);
+        if (commentService.containsUpvoter(id, author))
+            return new ResponseEntity<Long>(HttpStatus.FORBIDDEN);
+
+        long commentID = commentService.addUpvote(id, author.getAuthorID());
+        long nbrUpvoters = commentService.getNbrUpvotes(commentID);
+
+        return ResponseEntity.ok(nbrUpvoters);
+    }
+
+    @Override
     public ResponseEntity<Object> commentsPost(@NotNull @ApiParam(value = "The ID of the associated article.", required = true) @RequestParam(value = "articleID", required = true) Long articleID,
                                         @ApiParam(value = "The comment the user want to post", required = true) @RequestBody CommentRequest comment,
                                         @ApiParam(value = "(Optionnal) The ID of the responded comment.") @RequestParam(value = "parentID", required = false) Long parentID)
