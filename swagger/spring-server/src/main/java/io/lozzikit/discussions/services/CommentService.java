@@ -132,20 +132,20 @@ public class CommentService {
         return response;
     }
 
-    public boolean containsUpvoter(Long commentID, CommentRequest commentRequest) {
+    public boolean containsReactioner(Long commentID, CommentRequest commentRequest) {
         CommentEntity comment = commentRepository.findOne(commentID);
-        Set<ReactionEntity> upvoters = comment.getUpvoters();
-        return upvoters.contains(commentRequest.getAuthorID());
+        Set<ReactionEntity> reactions = comment.getReactions();
+        return reactions.contains(commentRequest.getAuthorID());
     }
 
-    public long getNbrUpvotes(Long commentID) {
+    public long getNbrReaction(Long commentID) {
         CommentEntity comment = commentRepository.findOne(commentID);
-        return comment.getUpvoters().size();
+        return comment.getReactions().size();
     }
 
-    public long addUpvote(Long commentID, Long authorID) {
+    public long addReaction(Long commentID, Long authorID) {
         CommentEntity comment = commentRepository.findOne(commentID);
-        comment.addUpvoter(authorID);
+        comment.addReaction(new ReactionEntity(authorID, comment));
         return  commentRepository.save(comment).getId();
     }
 
