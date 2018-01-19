@@ -138,14 +138,14 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  '/comments/{id}/upvote':
+  '/comments/{id}/reaction':
     get:
-      summary: Get the number of upvotes for a particular comment
-      description: The /comments/{id}/upvote endpoint allows a user to retreive the number of upvotes of a comment associated to an article.
+      summary: Get the number of reactions for a particular comment
+      description: The /comments/{id}/reaction endpoint allows a user to retreive the number of reactions of a comment associated to an article.
       parameters:
         - name: id
           in: path
-          description: ID of the comment having the upvotes we're interessted in.
+          description: ID of the comment having the reactions we're interessted in.
           required: true
           type: integer
           format: int64
@@ -153,8 +153,8 @@ paths:
         - Comments
       responses:
         '200':
-          description: The number of upvotes associated to the comment
-          schema: 
+          description: The number of reactions associated to the comment
+          schema:
             type: integer
             format: int64
         default:
@@ -162,18 +162,18 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     post:
-      summary: Add an upvote to the comment
-      description: The /comments/{api}/upvote endpoint allows a user to add an upvote to a comment of an article.
+      summary: Add a reaction to the comment
+      description: The /comments/{id}/reaction endpoint allows a user to add a reaction to a comment of an article.
       parameters:
         - name: id
           in: path
-          description: ID of the comment we want to upvote.
+          description: ID of the comment we want to react to.
           required: true
           type: integer
           format: int64
         - name: author
           in: body
-          description: The user who upvotes the comment
+          description: The user who reacts to the comment.
           required: true
           schema:
             $ref: '#/definitions/CommentRequest'
@@ -181,7 +181,35 @@ paths:
         - Comments
       responses:
         '201':
-          description: Comment successfully upvoted
+          description: Successfully reacted to the comment
+          schema:
+            type: integer
+            format: int64
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete a reaction to the comment
+      description: The /comments/{id}/reaction endpoint allows a user to delete a reaction to a comment of an article.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the comment we want to delete the reaction from.
+          required: true
+          type: integer
+          format: int64
+        - name: authorID
+          in: path
+          description: The user who wante to have his reaction deleted.
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - Comments
+      responses:
+        '201':
+          description: Reaction successfully deleted
           schema:
             type: integer
             format: int64
@@ -238,6 +266,10 @@ definitions:
         type: string
         format: date-time
         description: Display name of product.
+      reactions:
+        type: array
+        items:
+          $ref: '#/definitions/Reaction'
       children:
         type: array
         items:
@@ -250,6 +282,15 @@ definitions:
       - root
       - id
       - date
+  Reaction:
+    type: object
+    required:
+      - authorID
+    properties:
+      authorID:
+        type: integer
+        format: int64
+        description: The ID of the upvoter
   Error:
     type: object
     properties:

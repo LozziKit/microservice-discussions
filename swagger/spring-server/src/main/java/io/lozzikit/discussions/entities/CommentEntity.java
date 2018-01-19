@@ -33,7 +33,7 @@ public class CommentEntity implements Serializable {
     private Date date = new Date();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "commentEntity", cascade = CascadeType.ALL)
-    private Set<ReactionEntity> upvoters = new HashSet<>();
+    private Set<ReactionEntity> reactions = new HashSet<>();
 
     public CommentEntity() {
     }
@@ -119,13 +119,9 @@ public class CommentEntity implements Serializable {
         return children.isEmpty();
     }
 
-    public Set<ReactionEntity> getUpvoters() { return upvoters; }
+    public Set<ReactionEntity> getReactions() { return reactions; }
 
-    public void setUpvoters(Set<ReactionEntity> upvoters) { this.upvoters = upvoters; }
+    public void setReactions(Set<ReactionEntity> reaction) { this.reactions = reaction; }
 
-    public void addUpvoter(ReactionEntity upvoter) { upvoters.add(upvoter); }
-    public void addUpvoter(long userId) {
-        ReactionEntity reactionEntity = new ReactionEntity(userId, this);
-        upvoters.add(reactionEntity);
-    }
+    public void addReaction(ReactionEntity reaction) { reactions.add(reaction); }
 }

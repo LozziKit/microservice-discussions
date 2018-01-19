@@ -86,17 +86,17 @@ public class CommentsApiController implements CommentsApi {
     }
 
     @Override
-    public ResponseEntity<Long> commentsIdUpvoteGet(@ApiParam(value = "ID of the comment having the upvotes we're interessted in.",required=true ) @PathVariable("id") Long id) {
+    public ResponseEntity<Long> commentsIdReactionGet(@ApiParam(value = "ID of the comment having the upvotes we're interessted in.",required=true ) @PathVariable("id") Long id) {
         if (!commentService.commentExist(id))
             return new ResponseEntity<Long>(HttpStatus.NOT_FOUND);
         if (commentService.commentIsDeleted(id))
             return new ResponseEntity<Long>(HttpStatus.FORBIDDEN);
 
-        return ResponseEntity.ok(commentService.getNbrUpvotes(id));
+        return ResponseEntity.ok(commentService.getNbrReaction(id));
     }
 
     @Override
-    public ResponseEntity<Long> commentsIdUpvotePost(@ApiParam(value = "ID of the comment we want to upvote.",required=true ) @PathVariable("id") Long id,
+    public ResponseEntity<Long> commentsIdReactionPost(@ApiParam(value = "ID of the comment we want to upvote.",required=true ) @PathVariable("id") Long id,
                                               @ApiParam(value = "The user who upvotes the comment" ,required=true ) @RequestBody CommentRequest author) {
         if (!commentService.commentExist(id))
             return new ResponseEntity<Long>(HttpStatus.NOT_FOUND);
@@ -104,13 +104,19 @@ public class CommentsApiController implements CommentsApi {
             return new ResponseEntity<Long>(HttpStatus.BAD_REQUEST);
         if (commentService.commentIsDeleted(id))
             return new ResponseEntity<Long>(HttpStatus.FORBIDDEN);
-        if (commentService.containsUpvoter(id, author))
+        if (commentService.containsReactioner(id, author))
             return new ResponseEntity<Long>(HttpStatus.FORBIDDEN);
 
-        long commentID = commentService.addUpvote(id, author.getAuthorID());
-        long nbrUpvoters = commentService.getNbrUpvotes(commentID);
+        long commentID = commentService.addReaction(id, author.getAuthorID());
+        long nbrUpvoters = commentService.getNbrReaction(commentID);
 
         return ResponseEntity.ok(nbrUpvoters);
+    }
+
+    @Override
+    public ResponseEntity<Long> commentsIdReactionDelete(@ApiParam(value = "ID of the comment we want to delete the reaction from.",required=true ) @PathVariable("id") Long id,
+                                                         @ApiParam(value = "The user who wante to have his reaction deleted.",required=true ) @PathVariable("authorID") Long authorID) {
+        return null;
     }
 
     @Override
