@@ -3,6 +3,7 @@ package io.lozzikit.discussions.services;
 import io.lozzikit.discussions.api.model.CommentRequest;
 import io.lozzikit.discussions.api.model.CommentResponse;
 import io.lozzikit.discussions.entities.CommentEntity;
+import io.lozzikit.discussions.entities.ReactionEntity;
 import io.lozzikit.discussions.repositories.CommentRepository;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,7 +134,7 @@ public class CommentService {
 
     public boolean containsUpvoter(Long commentID, CommentRequest commentRequest) {
         CommentEntity comment = commentRepository.findOne(commentID);
-        Set<Long> upvoters = comment.getUpvoters();
+        Set<ReactionEntity> upvoters = comment.getUpvoters();
         return upvoters.contains(commentRequest.getAuthorID());
     }
 

@@ -2,9 +2,7 @@ package io.lozzikit.discussions.entities;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  */
@@ -34,7 +32,8 @@ public class CommentEntity implements Serializable {
 
     private Date date = new Date();
 
-    private Set<Long> upvoters = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "commentEntity", cascade = CascadeType.ALL)
+    private Set<ReactionEntity> upvoters = new HashSet<>();
 
     public CommentEntity() {
     }
@@ -120,9 +119,13 @@ public class CommentEntity implements Serializable {
         return children.isEmpty();
     }
 
-    public Set<Long> getUpvoters() { return upvoters; }
+    public Set<ReactionEntity> getUpvoters() { return upvoters; }
 
-    public void setUpvoters(Set<Long> upvoters) { this.upvoters = upvoters; }
+    public void setUpvoters(Set<ReactionEntity> upvoters) { this.upvoters = upvoters; }
 
-    public void addUpvoter(Long upvoter) { upvoters.add(upvoter); }
+    public void addUpvoter(ReactionEntity upvoter) { upvoters.add(upvoter); }
+    public void addUpvoter(long userId) {
+        ReactionEntity reactionEntity = new ReactionEntity(userId, this);
+        upvoters.add(reactionEntity);
+    }
 }
