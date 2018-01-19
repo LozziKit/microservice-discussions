@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   title: Microservice-Discussion API
-  description: Move your app forward with the Discussion API
+  description: Move your app forward with the Discussion API. Sometimes you have to pass a "BEARER <jwtToken>" within the "authorization" header
   version: 0.0.1
 host: localhost:8080
 basePath: /api
@@ -13,6 +13,11 @@ paths:
       summary: Register a comment
       description: The /comments endpoint allows a user to register a comment to an article or another comment of an article.
       parameters:
+        - in: header
+          name: authorization
+          description: JWT bearer token containing "userID" and "username" as claims
+          type: string
+          required: true
         - in: query
           name: articleID
           type: integer
@@ -37,6 +42,8 @@ paths:
           description: Comment successfully posted
           schema:
             type: object
+        '403':
+          description: 'If the user passed within the authorization header cannot do that'
         default:
           description: Unexpected error
           schema:
@@ -96,6 +103,11 @@ paths:
       summary: Update a comment
       description: 'The /comments/{id} endpoint allows a user to update a comment.'
       parameters:
+        - in: header
+          name: authorization
+          description: JWT bearer token containing "userID" and "username" as claims
+          type: string
+          required: true
         - name: id
           in: path
           description: ID of the comment we want to edit.
@@ -115,6 +127,8 @@ paths:
           description: The registered comment
           schema:
             type: object
+        '403':
+          description: 'If the user passed within the authorization header cannot do that'
         default:
           description: Unexpected error
           schema:
@@ -123,6 +137,11 @@ paths:
       summary: Delete a comment
       description: This endpoint allows a user to delete a comment.
       parameters:
+        - in: header
+          name: authorization
+          description: JWT bearer token containing "userID" and "username" as claims
+          type: string
+          required: true
         - name: id
           in: path
           description: ID of the comment we want to delete
@@ -134,6 +153,8 @@ paths:
       responses:
         '204':
           description: The comment has been successfully deleted
+        '403':
+          description: 'If the user passed within the authorization header cannot do that'
         default:
           description: Unexpected error
           schema:
@@ -162,21 +183,20 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     post:
-      summary: Add a reaction to the comment
+      summary: Add a reaction to the comment (upvote)
       description: The /comments/{id}/reaction endpoint allows a user to add a reaction to a comment of an article.
       parameters:
+        - in: header
+          name: authorization
+          description: JWT bearer token containing "userID" and "username" as claims
+          type: string
+          required: true
         - name: id
           in: path
           description: ID of the comment we want to react to.
           required: true
           type: integer
           format: int64
-        - name: author
-          in: body
-          description: The user who reacts to the comment.
-          required: true
-          schema:
-            $ref: '#/definitions/CommentRequest'
       tags:
         - Comments
       responses:
@@ -185,6 +205,8 @@ paths:
           schema:
             type: integer
             format: int64
+        '403':
+          description: 'If the user passed within the authorization header cannot do that'
         default:
           description: Unexpected error
           schema:
@@ -193,15 +215,14 @@ paths:
       summary: Delete a reaction to the comment
       description: The /comments/{id}/reaction endpoint allows a user to delete a reaction to a comment of an article.
       parameters:
+        - in: header
+          name: authorization
+          description: JWT bearer token containing "userID" and "username" as claims
+          type: string
+          required: true
         - name: id
           in: path
           description: ID of the comment we want to delete the reaction from.
-          required: true
-          type: integer
-          format: int64
-        - name: authorID
-          in: path
-          description: The user who wante to have his reaction deleted.
           required: true
           type: integer
           format: int64
@@ -213,6 +234,8 @@ paths:
           schema:
             type: integer
             format: int64
+        '403':
+          description: 'If the user passed within the authorization header cannot do that'
         default:
           description: Unexpected error
           schema:
@@ -221,17 +244,8 @@ definitions:
   CommentRequest:
     type: object
     required:
-      - authorID
-      - author
       - message
     properties:
-      authorID:
-        type: integer
-        format: int64
-        description: The ID of the comment author. (To be linked with the user microservice)
-      author:
-        type: string
-        description: The name of the creator of the comment
       message:
         type: string
         description: The content of the comment.

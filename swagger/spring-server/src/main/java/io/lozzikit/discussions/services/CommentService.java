@@ -5,6 +5,7 @@ import io.lozzikit.discussions.api.model.CommentResponse;
 import io.lozzikit.discussions.entities.CommentEntity;
 import io.lozzikit.discussions.entities.ReactionEntity;
 import io.lozzikit.discussions.repositories.CommentRepository;
+import io.lozzikit.discussions.utils.JWTUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -43,21 +44,21 @@ public class CommentService {
         return message != null && !message.isEmpty();
     }
 
-    public long addNewComments(CommentRequest commentRequest, long articleID, Long parentID) {
+    public long addNewComments(CommentRequest commentRequest, long articleID, Long parentID, JWTUtils.UserInfo userInfo) {
         System.out.println("parentID : " + parentID);
-        CommentEntity entity = toCommentEntity(commentRequest, articleID, parentID);
+        CommentEntity entity = toCommentEntity(commentRequest, articleID, parentID, userInfo);
 
         return commentRepository.save(entity).getId();
     }
 
-    public boolean asAuthor(CommentRequest commentRequest) {
+    /*public boolean asAuthor(CommentRequest commentRequest) {
         return commentRequest.getAuthorID() != null;
-    }
+    }//*/
 
-    public boolean asSameAuthor(long commentID, CommentRequest commentRequest) {
+    public boolean asSameAuthor(long commentID, CommentRequest commentRequest, long userId) {
         CommentEntity commentEntity = commentRepository.findOne(commentID);
 
-        return commentEntity.getAuthorID() == commentRequest.getAuthorID();
+        return commentEntity.getAuthorID() == userId;
     }
 
     public boolean commentIsDeleted(long id) {
@@ -87,11 +88,11 @@ public class CommentService {
         return commentRepository.save(commentEntity).getId();
     }
 
-    private CommentEntity toCommentEntity(CommentRequest comment, long articleID, Long parentID) {
+    private CommentEntity toCommentEntity(CommentRequest comment, long articleID, Long parentID, JWTUtils.UserInfo userInfos) {
         CommentEntity entity = new CommentEntity();
         entity.setArticleID(articleID);
-        entity.setAuthor(comment.getAuthor());
-        entity.setAuthorID(comment.getAuthorID());
+        entity.setAuthor(userInfos.getUsername());
+        entity.setAuthorID(userInfos.getUserId());
         entity.setMessage(comment.getMessage());
 
         System.out.println("parentID : " + parentID);
@@ -132,10 +133,10 @@ public class CommentService {
         return response;
     }
 
-    public boolean containsReactioner(Long commentID, CommentRequest commentRequest) {
+    public boolean containsReactioner(Long commentID, Long userID) {
         CommentEntity comment = commentRepository.findOne(commentID);
         Set<ReactionEntity> reactions = comment.getReactions();
-        return reactions.contains(commentRequest.getAuthorID());
+        return reactions.contains(userID);
     }
 
     public long getNbrReaction(Long commentID) {
@@ -159,5 +160,9 @@ public class CommentService {
         return comments.stream()
                 .map(s -> toCommentResponse(s, isTree))
                 .collect(Collectors.toList());
+    }
+
+    public boolean isCommentOwner(Long commentID, Long authorID){
+        return authorID.equals(commentRepository.findOne(commentID).getAuthorID());
     }
 }
