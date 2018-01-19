@@ -1,4 +1,4 @@
-package io.lozzikit.discussions.util;
+package io.lozzikit.discussions.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -15,8 +15,7 @@ public class JWTUtils {
         // We are not checking signature for now
         Claims claims = Jwts.parser().parseClaimsJws(token).getBody();
 
-
         return claims.get("userid", Long.class);
-    }//*/
+    }
 
 }
