@@ -124,4 +124,6 @@ public class CommentEntity implements Serializable {
     public void setReactions(Set<ReactionEntity> reaction) { this.reactions = reaction; }
 
     public void addReaction(ReactionEntity reaction) { reactions.add(reaction); }
+
+    public void removeReaction(ReactionEntity reaction) { reactions.remove(reaction); }
 }

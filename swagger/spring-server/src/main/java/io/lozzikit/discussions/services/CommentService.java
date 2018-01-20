@@ -132,10 +132,10 @@ public class CommentService {
         return response;
     }
 
-    public boolean containsReactioner(Long commentID, CommentRequest commentRequest) {
+    public boolean containsReactioner(Long commentID, Long authorID) {
         CommentEntity comment = commentRepository.findOne(commentID);
         Set<ReactionEntity> reactions = comment.getReactions();
-        return reactions.contains(commentRequest.getAuthorID());
+        return reactions.contains(authorID);
     }
 
     public long getNbrReaction(Long commentID) {
@@ -146,6 +146,12 @@ public class CommentService {
     public long addReaction(Long commentID, Long authorID) {
         CommentEntity comment = commentRepository.findOne(commentID);
         comment.addReaction(new ReactionEntity(authorID, comment));
+        return  commentRepository.save(comment).getId();
+    }
+
+    public long removeReacion(Long commentID, Long authorID) {
+        CommentEntity comment = commentRepository.findOne(commentID);
+        comment.removeReaction(new ReactionEntity(authorID, comment));
         return  commentRepository.save(comment).getId();
     }
 
