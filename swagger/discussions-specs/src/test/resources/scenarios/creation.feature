@@ -99,7 +99,7 @@ Feature: Creation of a discussion
   Scenario: Reacting to a comment
     Given The author 1 posted a comment for article 1 on the server
     And The comment is not deleted
-    And The autor 1 has not reacted to the comment
+    And The author 1 has not reacted to the comment
     When The author 1 reacts to the comment
     Then I receive a 201 status code
 
@@ -131,7 +131,7 @@ Feature: Creation of a discussion
   Scenario: Deleting a reaction to a comment
     Given The author 1 posted a comment for article 1 on the server
     And The comment is not deleted
-    And The autor 1 has reacted to the comment
+    And The author 1 has reacted to the comment
     When The author 1 sends a DELETE to the /comment/{id}/reaction endpoint
     Then I receive a 201 status code
 
