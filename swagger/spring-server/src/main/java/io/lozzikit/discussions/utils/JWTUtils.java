@@ -4,6 +4,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Simplified from https://www.toptal.com/java/rest-security-with-jwt-spring-security-and-java
  */
@@ -52,6 +55,15 @@ public class JWTUtils {
      * Parse a token and get the associated userId
      */
     public static UserInfo getUserInfo(String token) {
+        // Getting the token only (doing away with the "bearer" word)
+        Pattern pattern = Pattern.compile("^(bearer )?(.*)$", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(token);
+
+        matcher.matches();
+        token = matcher.group(matcher.groupCount());
+
+
+        // Parsing the JWT
         Claims claims = Jwts.parser()
                 .setSigningKey(SECRET)
                 .parseClaimsJws(token)

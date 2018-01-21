@@ -57,6 +57,10 @@ public class CommentsApiController implements CommentsApi {
         if (!commentService.commentExist(id))
             return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
 
+        if(authorization == null || authorization.isEmpty()){
+            return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
+        }
+
         // User information
         Long userID = JWTUtils.getUserInfo(authorization).getUserId();
 
@@ -73,6 +77,10 @@ public class CommentsApiController implements CommentsApi {
                                                 @ApiParam(value = "ID of the comment we want to edit.", required = true) @PathVariable("id") Long id,
                                                 @ApiParam(value = "The comment the user want to post", required = true) @RequestBody CommentRequest comment) {
         // User information
+        if(authorization == null || authorization.isEmpty()){
+            return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST);
+        }
+
         Long userID = JWTUtils.getUserInfo(authorization).getUserId();
 
         if (!commentService.containsMessage(comment))
@@ -112,6 +120,10 @@ public class CommentsApiController implements CommentsApi {
                                                        @ApiParam(value = "ID of the comment we want to react to.", required = true) @PathVariable("id") Long id)
 
     {
+        if(authorization == null || authorization.isEmpty()){
+            return new ResponseEntity<Long>(HttpStatus.BAD_REQUEST);
+        }
+
         // User information
         Long userID = JWTUtils.getUserInfo(authorization).getUserId();
 
@@ -133,6 +145,10 @@ public class CommentsApiController implements CommentsApi {
     public ResponseEntity<Long> commentsIdReactionDelete(@ApiParam(value = "JWT bearer token containing \"userID\" and \"username\" as claims", required = true) @RequestHeader(value = "authorization", required = true) String authorization,
                                                          @ApiParam(value = "ID of the comment we want to delete the reaction from.", required = true) @PathVariable("id") Long id) {
         // TODO
+        if(authorization == null || authorization.isEmpty()){
+            return new ResponseEntity<Long>(HttpStatus.BAD_REQUEST);
+        }
+
 
         return null;
     }
@@ -144,6 +160,10 @@ public class CommentsApiController implements CommentsApi {
                                                @ApiParam(value = "(Optionnal) The ID of the responded comment.") @RequestParam(value = "parentID", required = false) Long parentID) {
         if (!commentService.containsMessage(comment))
             return new ResponseEntity<Object>(HttpStatus.UNPROCESSABLE_ENTITY);
+
+        if(authorization == null || authorization.isEmpty()){
+            return new ResponseEntity<Object>(HttpStatus.BAD_REQUEST);
+        }
 
         System.out.println("parentID : " + parentID);
 

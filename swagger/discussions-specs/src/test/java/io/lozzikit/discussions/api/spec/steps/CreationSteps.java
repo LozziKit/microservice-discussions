@@ -1,6 +1,5 @@
 package io.lozzikit.discussions.api.spec.steps;
 
-import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -33,6 +32,17 @@ public class CreationSteps {
     private boolean lastApiCallThrewException;
     private int lastStatusCode;
     private long commentID;
+    private final String TOKEN1 = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1MTYzOTI4NTcsImV4cCI6MTU0NzkyODg1OCwiYXVkIjoiIiwic3ViIjoiTmFkaWRpZGkiLCJ1c2VySUQiOiIyIn0.43ZOfTOdyXlLd44nbwZCdGtOUQ62TyAkBEjb1fvDIVI";
+    private final String TOKEN2 = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1MTYzOTI4NTcsImV4cCI6MTU0NzkyODg1OCwiYXVkIjoiIiwic3ViIjoiYm91aWxsYWJhaXNzZSIsInVzZXJJRCI6IjcifQ.GMb-VpMvinBR_fcMW7ATH38dXFk6yh3x7A7w7rAiXqY";
+
+    private String userToken = "";
+
+    private int userId1 = 2;
+    private int userId2 = 7;
+
+    private String userName1 = "Nadididi";
+    private String userName2 = "bouillabaisse";
+
 
     public CreationSteps(Environment environment) {
         this.environment = environment;
@@ -47,12 +57,12 @@ public class CreationSteps {
 
     @Given("^I POST it to the /comments endpoint for the article (\\d+)$")
     public void i_POST_it_to_the_comments_endpoint_for_the_article(long articleID) throws Throwable {
-        postMessage(articleID, null);
+        postMessage(userToken, articleID, null);
     }
 
     @When("^I POST it to the /comments endpoint for article (\\d+)$")
     public void i_POST_it_to_the_comments_endpoint_for_article(long articleID) throws Throwable {
-        postMessage(articleID, null);
+        postMessage(userToken, articleID, null);
     }
 
     @Then("^I receive a (\\d+) status code$")
@@ -65,7 +75,7 @@ public class CreationSteps {
         if (commentRequest != null)
             commentRequest.setMessage("");
         else
-            commentRequest = createCommentRequest(1L, "El papa", "");
+            commentRequest = createCommentRequest("");
     }
 
     @Then("^The new comment should be in the list$")
@@ -82,13 +92,14 @@ public class CreationSteps {
 
     @Given("^I have a comment payload$")
     public void i_have_a_comment_payload() throws Throwable {
-        commentRequest = createCommentRequest(42L, "Le pape", "Amen");
+        commentRequest = createCommentRequest("Amen");
+        userToken = TOKEN1;
     }
 
     @Given("^There are some comments for article (\\d+) on the server$")
     public void there_are_some_comments_for_article_on_the_server(long articleID) throws Throwable {
-        api.commentsPost(articleID, createCommentRequest(2L, "Guy1", "Hello"), null);
-        api.commentsPost(articleID, createCommentRequest(3L, "Guy2", "How do you do"), null);
+        api.commentsPost(TOKEN1, articleID, createCommentRequest("Hello"), null);
+        api.commentsPost(TOKEN2, articleID, createCommentRequest("How do you do"), null);
     }
 
     @When("^I send a GET to the /comments endpoint for article (\\d+)$")
@@ -142,11 +153,11 @@ public class CreationSteps {
     @Given("^There is at least (\\d+) answer to a comment for article (\\d+)$")
     public void there_is_at_least_answer_to_a_comment_for_article(int arg1, long articleID) throws Throwable {
         // Posting 2 comments
-        commentRequest = createCommentRequest(1L, "MonAuthor", "Little message");
-        postMessage(articleID, null);
+        commentRequest = createCommentRequest("Little message");
+        postMessage(TOKEN1, articleID, null);
 
-        commentRequest = createCommentRequest(2L, "MonAutreAuteur", "Little response");
-        postMessage(articleID, commentID);
+        commentRequest = createCommentRequest("Little response");
+        postMessage(TOKEN2, articleID, commentID);
     }
 
     @Then("^I receive a list where some comments have children$")
@@ -176,7 +187,7 @@ public class CreationSteps {
         }
 
         //Delete the comment
-        api.commentsIdDelete(commentResponse.getId());
+        api.commentsIdDelete(TOKEN1, commentResponse.getId());
 
     }
 
@@ -208,7 +219,7 @@ public class CreationSteps {
         }
 
         //Delete the comment
-        api.commentsIdDelete(comment.getId());
+        api.commentsIdDelete(TOKEN1, comment.getId());
     }
 
     @Then("^the list should not contain the deleted comment$")
@@ -224,7 +235,7 @@ public class CreationSteps {
     @When("^I try to modify the comment$")
     public void i_try_to_modify_the_comment() throws Throwable {
         try {
-            lastApiResponse = api.commentsIdPutWithHttpInfo(commentID, commentRequest);
+            lastApiResponse = api.commentsIdPutWithHttpInfo(userToken, commentID, commentRequest);
             commentsResponse = (List<CommentResponse>) lastApiResponse.getData();
             lastApiCallThrewException = false;
             lastApiException = null;
@@ -239,46 +250,45 @@ public class CreationSteps {
 
     @Given("^I have a empty comment payload$")
     public void i_have_a_empty_comment_payload() throws Throwable {
-        commentRequest = createCommentRequest(1L, "Basile", "");
+        commentRequest = createCommentRequest("");
+        userToken = TOKEN1;
     }
 
     @Given("^The author (\\d+) posted a comment for article (\\d+) on the server$")
     public void the_author_posted_a_comment_for_article_on_the_server(long authorID, long articleID) throws Throwable {
-        commentRequest = createCommentRequest(authorID, "Basile", "Coucou <3");
-        postMessage(articleID, null);
+        String token = authorID == 1 ? TOKEN1 : TOKEN2;
+
+        commentRequest = createCommentRequest("Coucou <3");
+        postMessage(token, articleID, null);
     }
 
     @Given("^I have a comment payload without author$")
     public void i_have_a_comment_payload_without_author() throws Throwable {
-        commentRequest = createCommentRequest(null, null, "Coucou <3");
+        commentRequest = createCommentRequest("Coucou <3");
+        userToken = "";
     }
 
     @Given("^I have a comment payload from the author (\\d+)$")
     public void i_have_a_comment_payload_from_the_author(long authorID) throws Throwable {
-        commentRequest = createCommentRequest(authorID, "Bob", "Je suis un auteur");
+        commentRequest = createCommentRequest("Je suis un auteur");
+        userToken = authorID == 1 ? TOKEN1 : TOKEN2;
     }
 
     public CommentRequest createCommentRequest(
-            Long authorID,
-            String author,
             String message) {
         CommentRequest cr = new CommentRequest();
-        cr.setAuthor(author);
-        cr.setAuthorID(authorID);
         cr.setMessage(message);
 
         return cr;
     }
 
     private boolean compareCommentRequestAndCommentResponse(CommentRequest commentRequest, CommentResponse commentResponse) {
-        return commentRequest.getMessage().equals(commentResponse.getMessage()) &&
-                commentRequest.getAuthor().equals(commentResponse.getAuthor()) &&
-                commentRequest.getAuthorID().equals(commentResponse.getAuthorID());
+        return commentRequest.getMessage().equals(commentResponse.getMessage());
     }
 
-    private void postMessage(long articleID, Long parentID) {
+    private void postMessage(String token, long articleID, Long parentID) {
         try {
-            lastApiResponse = api.commentsPostWithHttpInfo(articleID, commentRequest, parentID);
+            lastApiResponse = api.commentsPostWithHttpInfo(userToken, articleID, commentRequest, parentID);
             lastApiCallThrewException = false;
             lastApiException = null;
             lastStatusCode = lastApiResponse.getStatusCode();
@@ -290,5 +300,9 @@ public class CreationSteps {
             lastApiException = e;
             lastStatusCode = lastApiException.getCode();
         }
+    }
+
+    private void setUserToken() {
+        userToken = TOKEN1;
     }
 }
