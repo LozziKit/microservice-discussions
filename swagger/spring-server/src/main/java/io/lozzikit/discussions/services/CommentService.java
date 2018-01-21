@@ -150,6 +150,12 @@ public class CommentService {
         return  commentRepository.save(comment).getId();
     }
 
+    public long removeReacion(Long commentID, Long authorID) {
+        CommentEntity comment = commentRepository.findOne(commentID);
+        comment.removeReaction(new ReactionEntity(authorID, comment));
+        return  commentRepository.save(comment).getId();
+    }
+
     private List<CommentResponse> toCommentResponse(List<CommentEntity> comments, boolean isTree) {
         return comments.stream()
                 .map(s -> toCommentResponse(s, isTree))

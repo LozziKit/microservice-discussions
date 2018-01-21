@@ -95,3 +95,55 @@ Feature: Creation of a discussion
     And I have a comment payload from the author 2
     When I try to modify the comment
     Then I receive a 201 status code
+    
+  Scenario: Reacting to a comment
+    Given The author 1 posted a comment for article 1 on the server
+    And The comment is not deleted
+    And The author 1 has not reacted to the comment
+    When The author 1 reacts to the comment
+    Then I receive a 201 status code
+
+  Scenario: Reacting to a comment I already reacted to should return a forbidden error
+    Given The author 1 posted a comment for article 1 on the server
+    And The comment is not deleted
+    And The author 1 has reacted to the comment
+    When The author 1 reacts to the comment
+    Then I receive a 403 status code
+    
+  Scenario: Reacting to a deleted comment should return a forbidden error
+    Given The author 1 posted a comment for article 1 on the server
+    And The comment is deleted
+    When The author 1 reacts to the comment
+    Then I receive a 403 status code
+
+  Scenario: Getting the number of reactions of a comment
+    Given The author 1 posted a comment for article 1 on the server
+    And The comment is not deleted
+    When I send a GET to the /comments/{id}/reaction endpoint
+    Then I receive a 201 status code
+
+  Scenario: Getting the number of reactions of a comment which is deleted should return a forbidden error
+    Given The author 1 posted a comment for article 1 on the server
+    And The comment is deleted
+    When I send a GET to the /comments/{id}/reaction endpoint
+    Then I receive a 403 status code
+
+  Scenario: Deleting a reaction to a comment
+    Given The author 1 posted a comment for article 1 on the server
+    And The comment is not deleted
+    And The author 1 has reacted to the comment
+    When The author 1 sends a DELETE to the /comment/{id}/reaction endpoint
+    Then I receive a 201 status code
+
+  Scenario: Deleting a reaction to a comment I never reacted to should return a bad request error
+    Given The author 1 posted a comment for article 1 on the server
+    And The comment is not deleted
+    And The author 1 has not reacted to the comment
+    When The author 1 sends a DELETE to the /comment/{id}/reaction endpoint
+    Then I receive a 400 status code
+
+  Scenario: Deleting a reaction to a deleted comment should return a forbidden error
+    Given The author 1 posted a comment for article 1 on the server
+    And The comment is deleted
+    When The author 1 sends a DELETE to the /comment/{id}/reaction endpoint
+    Then I receive a 403 status code
