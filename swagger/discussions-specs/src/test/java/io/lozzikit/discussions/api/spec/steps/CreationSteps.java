@@ -155,6 +155,7 @@ public class CreationSteps {
         // Posting 2 comments
         commentRequest = createCommentRequest("Little message");
         postMessage(TOKEN1, articleID, null);
+        System.out.println("comment ID just after the posting method: " + commentID);
 
         commentRequest = createCommentRequest("Little response");
         postMessage(TOKEN2, articleID, commentID);
@@ -288,13 +289,14 @@ public class CreationSteps {
 
     private void postMessage(String token, long articleID, Long parentID) {
         try {
-            lastApiResponse = api.commentsPostWithHttpInfo(userToken, articleID, commentRequest, parentID);
+            lastApiResponse = api.commentsPostWithHttpInfo(token, articleID, commentRequest, parentID);
             lastApiCallThrewException = false;
             lastApiException = null;
             lastStatusCode = lastApiResponse.getStatusCode();
             String location = ((ArrayList<String>) lastApiResponse.getHeaders().get("Location")).get(0);
             commentID = Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
         } catch (ApiException e) {
+            System.out.println("catch : " + e.getCode());
             lastApiCallThrewException = true;
             lastApiResponse = null;
             lastApiException = e;

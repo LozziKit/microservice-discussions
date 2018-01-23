@@ -92,7 +92,7 @@ Feature: Creation of a discussion
 
   Scenario: Modifying a comment
     Given The author 1 posted a comment for article 14 on the server
-    And I have a comment payload from the author 2
+    And I have a comment payload from the author 1
     When I try to modify the comment
     Then I receive a 201 status code
     
