@@ -8,6 +8,7 @@ import io.lozzikit.discussions.ApiResponse;
 import io.lozzikit.discussions.api.CommentsApi;
 import io.lozzikit.discussions.api.dto.CommentRequest;
 import io.lozzikit.discussions.api.dto.CommentResponse;
+import io.lozzikit.discussions.api.dto.Reaction;
 import io.lozzikit.discussions.api.spec.helpers.Environment;
 
 import java.util.ArrayList;
@@ -283,6 +284,76 @@ public class CreationSteps {
         return cr;
     }
 
+    @Given("^The comment is not deleted$")
+    public void the_comment_is_not_deleted() throws Throwable {
+        System.out.println(commentResponse == null ? "NULL" : "NOT NULL");
+            assertFalse(commentResponse.getMessage() == null);
+    }
+
+    @Given("^The author (\\d+) has not reacted to the comment$")
+    public void the_author_has_not_reacted_to_the_comment(int arg1) throws Throwable {
+        for (Reaction reaction : commentResponse.getReactions()) {
+            assertFalse(reaction.getAuthorID() == arg1);
+        }
+    }
+
+    @When("^The author (\\d+) reacts to the comment$")
+    public void the_author_reacts_to_the_comment(int arg1) throws Throwable {
+        String token = arg1 == 1 ? TOKEN1 : TOKEN2;
+
+        reactToMessage(token);
+    }
+
+    @Given("^The author (\\d+) has reacted to the comment$")
+    public void the_author_has_reacted_to_the_comment(int arg1) throws Throwable {
+        boolean hasReacted = false;
+        for (Reaction reaction : commentResponse.getReactions()) {
+            if (reaction.getAuthorID() == arg1) {
+                hasReacted = true;
+            }
+        }
+
+        assertTrue(hasReacted);
+    }
+
+    @Given("^The comment is deleted$")
+    public void the_comment_is_deleted() throws Throwable {
+        assertTrue(commentResponse.getMessage() == null);
+    }
+
+    @When("^I send a GET to the /comments/id/reaction endpoint$")
+    public void i_send_a_GET_to_the_comments_id_reaction_endpoint() throws Throwable {
+        try {
+            lastApiResponse = api.commentsIdReactionGetWithHttpInfo(commentID);
+            commentsResponse = (List<CommentResponse>) lastApiResponse.getData();
+            lastApiCallThrewException = false;
+            lastApiException = null;
+            lastStatusCode = lastApiResponse.getStatusCode();
+        } catch (ApiException e) {
+            lastApiCallThrewException = true;
+            lastApiResponse = null;
+            lastApiException = e;
+            lastStatusCode = lastApiException.getCode();
+        }
+    }
+
+    @When("^The author (\\d+) sends a DELETE to the /comment/id/reaction endpoint$")
+    public void the_author_sends_a_DELETE_to_the_comment_id_reaction_endpoint(int arg1) throws Throwable {
+        try {
+            String token = arg1 == 1 ? TOKEN1 : TOKEN2;
+            lastApiResponse = api.commentsIdReactionDeleteWithHttpInfo(token, commentID);
+            commentsResponse = (List<CommentResponse>) lastApiResponse.getData();
+            lastApiCallThrewException = false;
+            lastApiException = null;
+            lastStatusCode = lastApiResponse.getStatusCode();
+        } catch (ApiException e) {
+            lastApiCallThrewException = true;
+            lastApiResponse = null;
+            lastApiException = e;
+            lastStatusCode = lastApiException.getCode();
+        }
+    }
+
     private boolean compareCommentRequestAndCommentResponse(CommentRequest commentRequest, CommentResponse commentResponse) {
         return commentRequest.getMessage().equals(commentResponse.getMessage());
     }
@@ -295,6 +366,23 @@ public class CreationSteps {
             lastStatusCode = lastApiResponse.getStatusCode();
             String location = ((ArrayList<String>) lastApiResponse.getHeaders().get("Location")).get(0);
             commentID = Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
+        } catch (ApiException e) {
+            System.out.println("catch : " + e.getCode());
+            lastApiCallThrewException = true;
+            lastApiResponse = null;
+            lastApiException = e;
+            lastStatusCode = lastApiException.getCode();
+        }
+    }
+
+    private void reactToMessage(String token) {
+        try {
+            lastApiResponse = api.commentsIdReactionPostWithHttpInfo(token, commentID);
+            lastApiCallThrewException = false;
+            lastApiException = null;
+            lastStatusCode = lastApiResponse.getStatusCode();
+            String location = ((ArrayList<String>) lastApiResponse.getHeaders().get("Location")).get(0);
+            this.commentID = Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
         } catch (ApiException e) {
             System.out.println("catch : " + e.getCode());
             lastApiCallThrewException = true;
