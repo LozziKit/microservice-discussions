@@ -49,13 +49,13 @@ Feature: Creation of a discussion
   Scenario: delete a comment for article 1
     Given There are some comments for article 1 on the server
     And There is at least 1 answer to a comment for article 1
-    When I delete one of them wich is a not leaf in article 1
+    When I delete one of them which is a not leaf in article 1
     And I send a GET to the /comments endpoint for article 1
     Then the list should contain the deleted comment with no message
 
   Scenario: delete a leaf comment for article 2
     Given There are some comments for article 2 on the server
-    When I delete one of them wich is a leaf in article 2
+    When I delete one of them which is a leaf in article 2
     And I send a GET to the /comments endpoint for article 2
     Then the list should not contain the deleted comment
 
@@ -98,47 +98,47 @@ Feature: Creation of a discussion
     
   Scenario: Reacting to a comment
     Given The author 1 posted a comment for article 1 on the server
-    And The comment is not deleted
-    And The author 1 has not reacted to the comment
     When The author 1 reacts to the comment
-    Then I receive a 201 status code
+    Then I receive a 200 status code
 
   Scenario: Reacting to a comment I already reacted to should return a forbidden error
     Given The author 1 posted a comment for article 1 on the server
-    And The comment is not deleted
     And The author 1 has reacted to the comment
     When The author 1 reacts to the comment
     Then I receive a 403 status code
     
-  Scenario: Reacting to a deleted comment should return a forbidden error
-    Given The author 1 posted a comment for article 1 on the server
-    And The comment is deleted
-    When The author 1 reacts to the comment
+  Scenario: Reacting to a deleted comment which is not a leaf should return a forbidden error
+    Given The author 1 posted a comment for article 15 on the server
+    And There is at least 1 answer to a comment for article 15
+    And I delete one of them which is a not leaf in article 15
+    When The author 1 reacts to the deleted comment
     Then I receive a 403 status code
 
+  Scenario: Reacting to a deleted comment which is a leaf should return a Not Found error
+    Given The author 1 posted a comment for article 16 on the server
+    And I delete one of them which is a leaf in article
+    When The author 1 reacts to the deleted comment
+    Then I receive a 404 status code
+
   Scenario: Getting the number of reactions of a comment
-    Given The author 1 posted a comment for article 1 on the server
-    And The comment is not deleted
+    Given The author 1 posted a comment for article 17 on the server
     When I send a GET to the /comments/id/reaction endpoint
-    Then I receive a 201 status code
+    Then I receive a 200 status code
 
   Scenario: Getting the number of reactions of a comment which is deleted should return a forbidden error
     Given The author 1 posted a comment for article 1 on the server
     And The comment is deleted
     When I send a GET to the /comments/id/reaction endpoint
-    Then I receive a 403 status code
+    Then I receive a 404 status code
 
   Scenario: Deleting a reaction to a comment
     Given The author 1 posted a comment for article 1 on the server
-    And The comment is not deleted
     And The author 1 has reacted to the comment
     When The author 1 sends a DELETE to the /comment/id/reaction endpoint
-    Then I receive a 201 status code
+    Then I receive a 200 status code
 
   Scenario: Deleting a reaction to a comment I never reacted to should return a bad request error
     Given The author 1 posted a comment for article 1 on the server
-    And The comment is not deleted
-    And The author 1 has not reacted to the comment
     When The author 1 sends a DELETE to the /comment/id/reaction endpoint
     Then I receive a 400 status code
 

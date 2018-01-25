@@ -41,6 +41,8 @@ public class CreationSteps {
     private int userId1 = 2;
     private int userId2 = 7;
 
+    private long reactionNumber;
+
     private String userName1 = "Nadididi";
     private String userName2 = "bouillabaisse";
 
@@ -175,12 +177,12 @@ public class CreationSteps {
         assertTrue(ok);
     }
 
-    @When("^I delete one of them wich is a not leaf in article (\\d+)$")
-    public void i_delete_one_of_them_wich_is_a_not_leaf_in_article(int arg1) throws Throwable {
+    @When("^I delete one of them which is a not leaf in article (\\d+)$")
+    public void i_delete_one_of_them_which_is_a_not_leaf_in_article(int arg1) throws Throwable {
         //Getting all comments for article with arg1 id
         commentsResponse = api.commentsGet((long) arg1, true);
 
-        //Finding the first comment wich is not a leaf
+        //Finding the first comment which is not a leaf
         for (CommentResponse comment : commentsResponse) {
             if (!comment.getChildren().isEmpty()) {
                 commentResponse = comment;
@@ -188,8 +190,9 @@ public class CreationSteps {
             }
         }
 
+        commentID = commentResponse.getId();
         //Delete the comment
-        api.commentsIdDelete(TOKEN1, commentResponse.getId());
+        api.commentsIdDelete(TOKEN1, commentID);
 
     }
 
@@ -206,12 +209,12 @@ public class CreationSteps {
         assertTrue(exists);
     }
 
-    @When("^I delete one of them wich is a leaf in article (\\d+)$")
-    public void i_delete_one_of_them_wich_is_a_leaf_in_article(int arg1) throws Throwable {
+    @When("^I delete one of them which is a leaf in article (\\d+)$")
+    public void i_delete_one_of_them_which_is_a_leaf_in_article(int arg1) throws Throwable {
         //Getting all comments for article with arg1 id
         commentsResponse = api.commentsGet((long) arg1, true);
 
-        //Finding the first comment wich is not a leaf
+        //Finding the first comment which is not a leaf
         CommentResponse comment = commentsResponse.get(0);
         List<CommentResponse> children = comment.getChildren();
 
@@ -284,12 +287,6 @@ public class CreationSteps {
         return cr;
     }
 
-    @Given("^The comment is not deleted$")
-    public void the_comment_is_not_deleted() throws Throwable {
-        System.out.println(commentResponse == null ? "NULL" : "NOT NULL");
-            assertFalse(commentResponse.getMessage() == null);
-    }
-
     @Given("^The author (\\d+) has not reacted to the comment$")
     public void the_author_has_not_reacted_to_the_comment(int arg1) throws Throwable {
         for (Reaction reaction : commentResponse.getReactions()) {
@@ -299,33 +296,27 @@ public class CreationSteps {
 
     @When("^The author (\\d+) reacts to the comment$")
     public void the_author_reacts_to_the_comment(int arg1) throws Throwable {
-        String token = arg1 == 1 ? TOKEN1 : TOKEN2;
+        String token = (arg1 == 1 ? TOKEN1 : TOKEN2);
 
         reactToMessage(token);
     }
 
     @Given("^The author (\\d+) has reacted to the comment$")
     public void the_author_has_reacted_to_the_comment(int arg1) throws Throwable {
-        boolean hasReacted = false;
-        for (Reaction reaction : commentResponse.getReactions()) {
-            if (reaction.getAuthorID() == arg1) {
-                hasReacted = true;
-            }
-        }
-
-        assertTrue(hasReacted);
+        String token = (arg1 == 1 ? TOKEN1 : TOKEN2);
+        reactToMessage(token);
     }
 
     @Given("^The comment is deleted$")
     public void the_comment_is_deleted() throws Throwable {
-        assertTrue(commentResponse.getMessage() == null);
+        api.commentsIdDelete(TOKEN1, commentID);
     }
 
     @When("^I send a GET to the /comments/id/reaction endpoint$")
     public void i_send_a_GET_to_the_comments_id_reaction_endpoint() throws Throwable {
         try {
             lastApiResponse = api.commentsIdReactionGetWithHttpInfo(commentID);
-            commentsResponse = (List<CommentResponse>) lastApiResponse.getData();
+            reactionNumber = (long) lastApiResponse.getData();
             lastApiCallThrewException = false;
             lastApiException = null;
             lastStatusCode = lastApiResponse.getStatusCode();
@@ -342,7 +333,7 @@ public class CreationSteps {
         try {
             String token = arg1 == 1 ? TOKEN1 : TOKEN2;
             lastApiResponse = api.commentsIdReactionDeleteWithHttpInfo(token, commentID);
-            commentsResponse = (List<CommentResponse>) lastApiResponse.getData();
+            reactionNumber = (long) lastApiResponse.getData();
             lastApiCallThrewException = false;
             lastApiException = null;
             lastStatusCode = lastApiResponse.getStatusCode();
@@ -352,6 +343,19 @@ public class CreationSteps {
             lastApiException = e;
             lastStatusCode = lastApiException.getCode();
         }
+    }
+
+    @When("^The author (\\d+) reacts to the deleted comment$")
+    public void the_author_reacts_to_the_deleted_comment(int arg1) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        String token = (arg1 == 1 ? TOKEN1 : TOKEN2);
+        reactToMessage(token);
+    }
+
+    @Given("^I delete one of them which is a leaf in article$")
+    public void i_delete_one_of_them_which_is_a_leaf_in_article() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        api.commentsIdDelete(TOKEN1, commentID);
     }
 
     private boolean compareCommentRequestAndCommentResponse(CommentRequest commentRequest, CommentResponse commentResponse) {
@@ -381,8 +385,7 @@ public class CreationSteps {
             lastApiCallThrewException = false;
             lastApiException = null;
             lastStatusCode = lastApiResponse.getStatusCode();
-            String location = ((ArrayList<String>) lastApiResponse.getHeaders().get("Location")).get(0);
-            this.commentID = Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
+            reactionNumber = (long) lastApiResponse.getData();
         } catch (ApiException e) {
             System.out.println("catch : " + e.getCode());
             lastApiCallThrewException = true;

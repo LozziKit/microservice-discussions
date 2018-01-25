@@ -31,6 +31,10 @@ public class ReactionEntity {
         return this.authorID;
     }
 
+    public long getId() {
+        return id;
+    }
+
     public CommentEntity getCommentEntity(){
         return this.commentEntity;
     }

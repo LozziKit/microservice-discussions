@@ -2,9 +2,11 @@ package io.lozzikit.discussions.services;
 
 import io.lozzikit.discussions.api.model.CommentRequest;
 import io.lozzikit.discussions.api.model.CommentResponse;
+import io.lozzikit.discussions.api.model.Reaction;
 import io.lozzikit.discussions.entities.CommentEntity;
 import io.lozzikit.discussions.entities.ReactionEntity;
 import io.lozzikit.discussions.repositories.CommentRepository;
+import io.lozzikit.discussions.repositories.ReactionRepository;
 import io.lozzikit.discussions.utils.JWTUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,9 @@ import java.util.stream.Collectors;
 public class CommentService {
     @Autowired
     CommentRepository commentRepository;
+
+    @Autowired
+    ReactionRepository reactionRepository;
 
     public List<CommentResponse> getCommentsTreeFromArticleID(long articleID) {
         List<CommentEntity> commentsEntities = commentRepository.findByRootAndArticleID(true, articleID);
@@ -45,7 +50,6 @@ public class CommentService {
     }
 
     public long addNewComments(CommentRequest commentRequest, long articleID, Long parentID, JWTUtils.UserInfo userInfo) {
-        System.out.println("parentID : " + parentID);
         CommentEntity entity = toCommentEntity(commentRequest, articleID, parentID, userInfo);
 
         return commentRepository.save(entity).getId();
@@ -95,8 +99,6 @@ public class CommentService {
         entity.setAuthorID(userInfos.getUserId());
         entity.setMessage(comment.getMessage());
 
-        System.out.println("parentID : " + parentID);
-
         if (parentID == null) {
             entity.setRoot(true);
         } else if (entity.getId() == parentID) {
@@ -123,6 +125,7 @@ public class CommentService {
         response.setId(comment.getId());
         response.setMessage(comment.getMessage());
         response.setRoot(comment.isRoot());
+        response.setReactions(toReaction(comment.getReactions()));
 
         if (isTree && comment.getChildren() != null)
             response.setChildren(toCommentResponse(comment.getChildren(), isTree));
@@ -135,8 +138,11 @@ public class CommentService {
 
     public boolean containsReactioner(Long commentID, Long userID) {
         CommentEntity comment = commentRepository.findOne(commentID);
-        Set<ReactionEntity> reactions = comment.getReactions();
-        return reactions.contains(userID);
+
+        return comment.getReactions()
+                .stream()
+                .filter(c -> c.getAuthorID() == userID)
+                .count() > 0;
     }
 
     public long getNbrReaction(Long commentID) {
@@ -146,14 +152,28 @@ public class CommentService {
 
     public long addReaction(Long commentID, Long authorID) {
         CommentEntity comment = commentRepository.findOne(commentID);
-        comment.addReaction(new ReactionEntity(authorID, comment));
-        return  commentRepository.save(comment).getId();
+        ReactionEntity reactionEntity = new ReactionEntity(authorID, comment);
+        comment.addReaction(reactionEntity);
+        reactionRepository.save(reactionEntity);
+
+        return commentRepository.save(comment).getId();
     }
 
     public long removeReacion(Long commentID, Long authorID) {
         CommentEntity comment = commentRepository.findOne(commentID);
-        comment.removeReaction(new ReactionEntity(authorID, comment));
-        return  commentRepository.save(comment).getId();
+
+        ReactionEntity reactionEntity = comment.getReactions().stream()
+                .filter(r -> r.getAuthorID() == authorID)
+                .collect(Collectors.toList())
+                .get(0);
+
+        reactionRepository.delete(reactionEntity);
+
+        Set<ReactionEntity> reactionEntities = comment.getReactions();
+        reactionEntities.remove(reactionEntity);
+        comment.setReactions(reactionEntities);
+
+        return commentRepository.save(comment).getId();
     }
 
     private List<CommentResponse> toCommentResponse(List<CommentEntity> comments, boolean isTree) {
@@ -168,7 +188,20 @@ public class CommentService {
                 .collect(Collectors.toList());
     }
 
-    public boolean isCommentOwner(Long commentID, Long authorID){
+    private List<Reaction> toReaction(Set<ReactionEntity> reactions) {
+        return reactions.stream()
+                .map(reaction -> toReaction(reaction))
+                .collect(Collectors.toList());
+    }
+
+    private Reaction toReaction(ReactionEntity reactionEntity) {
+        Reaction reaction = new Reaction();
+        reaction.setAuthorID(reactionEntity.getAuthorID());
+
+        return reaction;
+    }
+
+    public boolean isCommentOwner(Long commentID, Long authorID) {
         return authorID.equals(commentRepository.findOne(commentID).getAuthorID());
     }
 }

@@ -151,6 +151,8 @@ public class CommentsApiController implements CommentsApi {
             return new ResponseEntity<Long>(HttpStatus.BAD_REQUEST);
 
         Long authorID = JWTUtils.getUserInfo(authorization).getUserId();
+        if (!commentService.commentExist(id))
+            return new ResponseEntity<Long>(HttpStatus.FORBIDDEN);
         if (commentService.commentIsDeleted(id))
             return new ResponseEntity<Long>(HttpStatus.FORBIDDEN);
         if (!commentService.containsReactioner(id, authorID))
