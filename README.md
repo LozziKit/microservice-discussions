@@ -8,7 +8,7 @@ This service helps you to deploy a discussion system service. Once the server ha
 
 ## Basic ideas
 
-You have developed an app or a website and you want to add some kind of interaction between the users you have. Your are dealing with user authorization with JWTs (JSON Web Token) - maybe using the _User and Team_ microservice from Lozzikit. (https://github.com/LozziKit/microservice-users-and-teams) - and now want the user to be able to comment on some of the pages of your app. 
+You have developed an app or a website and you want to add some kind of interaction between the users you have. You are dealing with user authorization with JWTs (JSON Web Token) - maybe using the _User and Team_ microservice from Lozzikit. (https://github.com/LozziKit/microservice-users-and-teams) - and now want the user to be able to comment on some of the pages of your app. 
 
 ### Commenting
 
