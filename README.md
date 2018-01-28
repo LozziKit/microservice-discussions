@@ -67,4 +67,4 @@ It mainly exposes these endpoints:
 
  ## Bugs
 
-When deleting a reaction, we receive the expeted response (the new number of reactions). But if we get the comment where the reaction has supposedly been deleted, we see, in fact, that the reaction is still there. The process to get the number of reactions with a GET to the /comments/{id}/reactions endpoint is the same as the one used to send a response when we send a DELETE to the same endpoint. 
+When deleting a reaction, we receive the expeted response (the new number of reactions). But if we get the comment where the reaction has supposedly been deleted, we see, in fact, that the reaction is still there. The process to get the number of reactions with a GET to the _/comments/{id}/reactions_ endpoint is the same as the one used to send a response when we send a DELETE to the same endpoint. 
