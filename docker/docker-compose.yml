@@ -1,0 +1,13 @@
+version: '3.1'
+
+services:
+    server:
+        build:
+          context: ./src
+          dockerfile: Dockerfile
+        expose:
+          - 8080
+        ports:
+          - 8080:8080
+        container_name: microservice-discussion
+
