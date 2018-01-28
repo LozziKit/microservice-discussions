@@ -4,7 +4,7 @@
 
 This microservice has been developed as part of the course AMT from the HEIG-VD (HES-SO) swiss university. 
 
-This service helps you to deploy a discussion system service. Once the server has been started, it exposes some REST endpoints your frontend can request to comment, upvote or retrieve all of the comments of a particular _articleID_ you define yourself. 
+This service helps you to deploy a discussion system service. Once the server has been started, it exposes some REST endpoints your frontend can request to comment, react or retrieve all of the comments of a particular _articleID_ you define yourself. 
 
 ## Basic ideas
 
@@ -12,7 +12,7 @@ You have developed an app or a website and you want to add some kind of interact
 
 ### Commenting
 
-With this service, your user will be able to comment on a specific page or article, defined by an integer _articleID_. When a user want to comment a specific article, he will POST to the _/comments_ endpoints, with the _articleID_ as a parameter. The fact that it is the first comment or not does not make any difference: you don't have to deal with article creation. 
+With this service, your user will be able to comment on a specific page or article, defined by an integer _articleID_. When a user wants to comment a specific article, he will POST to the _/comments_ endpoints, with the _articleID_ as a parameter. The fact that it is the first comment or not does not make any difference: you don't have to deal with article creation. 
 
 ### Reacting
 
@@ -45,7 +45,7 @@ Everything should now be up and running, including the server exposing the REST 
 
 _**Using Docker for Windows**_: you will have to use the _Docker Quickstart Terminal_ for the _docker-compose_ up to work properly.
 
-_**Using it on linux or Mac OS**_: you will have to change the IP of the database from the code and recompile the whole project. You will have to modify the file located at _/swagger/spring-server/src/main/resources/application.properties_ so:
+_**Using it on linux or Mac OS**_: you will have to change the IP of the database from the code and recompile the whole project. You will have to modify the file located at _/swagger/spring-server/src/main/resources/application.properties_ like so:
 ### Before
 ```
 spring.datasource.url = jdbc:mysql://192.168.99.100:3306/microservice-discussions?useSSL=false 
