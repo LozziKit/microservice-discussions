@@ -158,7 +158,7 @@ public class CommentsApiController implements CommentsApi {
         if (!commentService.containsReactioner(id, authorID))
             return new ResponseEntity<Long>(HttpStatus.BAD_REQUEST);
 
-        long commentID = commentService.removeReacion(id, authorID);
+        long commentID = commentService.removeReaction(id, authorID);
         long nbrReactions = commentService.getNbrReaction(commentID);
 
         return ResponseEntity.ok(nbrReactions);

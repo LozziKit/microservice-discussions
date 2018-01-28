@@ -159,7 +159,7 @@ public class CommentService {
         return commentRepository.save(comment).getId();
     }
 
-    public long removeReacion(Long commentID, Long authorID) {
+    public long removeReaction(Long commentID, Long authorID) {
         CommentEntity comment = commentRepository.findOne(commentID);
 
         ReactionEntity reactionEntity = comment.getReactions().stream()
