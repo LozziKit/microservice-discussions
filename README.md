@@ -64,3 +64,7 @@ Before cloning this repo, you may want to check all of the endpoints this server
 It mainly exposes these endpoints:
  - _/comments_: used to POST, DELETE, PUT or GET comments.
  - _/comments/{id}/reactions_: used to POST, DELETE or GET reactions for a specific comment. 
+
+ ## Bugs
+
+When deleting a reaction, we receive the expeted response (the new number of reactions). But if we get the comment where the reaction has supposedly been deleted, we see, in fact, that the reaction is still there. The process to get the number of reactions with a GET to the /comments/{id}/reactions endpoint is the same as the one used to send a response when we send a DELETE to the same endpoint. 
