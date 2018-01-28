@@ -45,6 +45,17 @@ Everything should now be up and running, including the server exposing the REST 
 
 _**Using Docker for Windows**_: you will have to use the _Docker Quickstart Terminal_ for the _docker-compose_ up to work properly.
 
+_**Using it on linux or Mac OS**_: you will have to change the IP of the database from the code and recompile the whole project. You will have to modify the file located at _/swagger/spring-server/src/main/resources/application.properties_ so:
+### Before
+```
+spring.datasource.url = jdbc:mysql://192.168.99.100:3306/microservice-discussions?useSSL=false 
+```
+### After
+```
+spring.datasource.url = jdbc:mysql://localhost:3306/microservice-discussions?useSSL=false 
+```
+
+
 
 ## REST API
 
