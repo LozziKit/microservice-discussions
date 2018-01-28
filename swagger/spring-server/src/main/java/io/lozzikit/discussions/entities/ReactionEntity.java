@@ -4,7 +4,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "upvote")
+@Table(name = "reaction")
 public class ReactionEntity {
 
     @Id
